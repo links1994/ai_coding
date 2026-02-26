@@ -22,7 +22,7 @@ tools: Read, Write, Grep, Glob
 
 - `artifacts/spec/{program_id}/design.md` — 技术规格书
 - `artifacts/generated/{program_id}/reports/code-generation-report.md` — 代码生成报告
-- `repos/{service}/src/main/java/` — 相关 Java 源代码
+- `{service}/src/main/java/` — 相关 Java 源代码（相对于项目根目录）
 - `orchestrator/ALWAYS/RESOURCE-MAP.yml` — 项目资源映射
 
 ---
@@ -58,7 +58,7 @@ tools: Read, Write, Grep, Glob
 - 依赖关系
 - 关键设计决策
 - 测试用例
-- 注意事项
+- 使用约束
 
 ### Step 3: 更新功能索引
 
@@ -75,7 +75,7 @@ tools: Read, Write, Grep, Glob
 生成 `.qoder/repowiki/features/{feature-id}/reuse-guide.md`，包含：
 - 快速复用场景（完整功能复用、部分组件复用）
 - 修改建议
-- 常见问题解答
+- 问题解答
 
 ---
 
@@ -136,7 +136,7 @@ tools: Read, Write, Grep, Glob
 
 ## 相关文档
 
-- **功能检索 Skill**: `.qoder/skills/feature-retrieval.md`
+- **知识库查询 Skill**: `.qoder/skills/knowledge-base-query.md`（用于检索已归档功能）
 - **功能归档目录**: `.qoder/repowiki/features/`
 - **快速指引**: `.qoder/repowiki/features/README-features.md`
 - **代码生成 Skill**: `.qoder/skills/java-code-generation.md`

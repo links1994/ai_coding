@@ -12,7 +12,7 @@ output_language: 中文
 
 使用 ReAct (Reasoning + Acting) 设计模式，与用户进行交互式需求澄清。逐个问题确认，提供选项供用户选择，实时更新问题清单和确认结果。
 
-> **注意**：本 Skill 遵循的规范定义在 `.qoder/rules/02-requirement-clarification.md`，包括澄清流程、问题优先级定义、决策记录格式等。
+> **规范引用**：本 Skill 遵循的规范定义在 `.qoder/rules/02-requirement-clarification.md`，包括澄清流程、问题优先级定义、决策记录格式等。
 
 ---
 
@@ -181,7 +181,7 @@ D. 其他（请描述具体需求）
 
 #### 2.4 Update - 实时更新文档
 
-**立即更新 `workspace/questions.md`：**
+**实时更新 `workspace/questions.md`**：
 ```markdown
 ## 问题列表
 
@@ -193,7 +193,7 @@ D. 其他（请描述具体需求）
 | 2 | 创建时绑定技能 | 影响接口参数 | 可选技能列表 | 🔄 进行中 | - |
 ```
 
-**立即更新 `workspace/answers.md`：**
+**实时更新 `workspace/answers.md`**：
 ```markdown
 ## 问题确认结果
 

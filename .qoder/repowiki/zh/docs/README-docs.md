@@ -97,7 +97,7 @@
 - `backup-restore.md` - 备份恢复
 
 #### troubleshooting/ - 故障排查
-- `common-issues.md` - 常见问题
+- `common-issues.md` - 已知问题
 - `performance-tuning.md` - 性能调优
 
 **使用场景**：
@@ -107,7 +107,7 @@
 
 ---
 
-## 如何使用
+## 使用方式
 
 ### 方式 1：直接浏览
 
@@ -126,7 +126,7 @@ cat .qoder/repowiki/docs/apis/internal/user-service-api.md
 使用 `offline-doc-query` Skill 智能检索：
 
 ```
-用户: "mybatis-plus 分页查询怎么用？"
+用户: "mybatis-plus 分页查询如何实现？"
 Agent:
   → 调用 offline-doc-query Skill
   → 检索 docs/frameworks/mybatis-plus/

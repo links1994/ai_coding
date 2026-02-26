@@ -159,18 +159,17 @@ public interface AgentFeignService {
 
     // 查询类：使用 Query 参数，禁止路径参数
     @GetMapping("/agent/detail")
-    Result<AgentDTO> getAgentById(@RequestParam("agentId") Long agentId);
+    Result<AgentApiResponse> getAgentById(@RequestParam("agentId") Long agentId);
 
-    @GetMapping("/agent/list")
-    Result<PageResult<AgentDTO>> listAgents(@RequestParam("userId") Long userId, 
-                                             @RequestParam("status") Integer status);
+    @PostMapping("/agent/list")
+    Result<PageResult<AgentApiResponse>> pageAgent(@RequestBody AgentListApiRequest request);
 
     // 操作类：使用 RequestBody
     @PostMapping("/agent/create")
-    Result<Long> createAgent(@RequestBody AgentCreateDTO dto);
+    Result<Long> createAgent(@RequestBody AgentCreateApiRequest request);
 
     @PostMapping("/agent/update-status")
-    Result<Void> updateAgentStatus(@RequestBody AgentStatusUpdateDTO dto);
+    Result<Void> updateAgentStatus(@RequestBody AgentStatusApiRequest request);
 }
 
 // mall-user 服务提供，供 mall-agent 调用
@@ -298,7 +297,7 @@ sequenceDiagram
 ### 4.3 代码结构
 
 ```
-repos/mall-admin/src/main/java/com/aim/mall/admin/
+mall-admin/src/main/java/com/aim/mall/admin/
 ├── controller/
 │   └── AgentAdminController.java      # 管理后台接口
 ├── feign/
@@ -306,7 +305,7 @@ repos/mall-admin/src/main/java/com/aim/mall/admin/
 └── vo/
     └── AgentVO.java                   # 返回视图对象
 
-repos/mall-app/src/main/java/com/aim/mall/app/
+mall-app/src/main/java/com/aim/mall/app/
 ├── controller/
 │   └── AgentAppController.java     # 客户端接口
 ├── feign/
@@ -314,7 +313,7 @@ repos/mall-app/src/main/java/com/aim/mall/app/
 └── vo/
     └── AgentVO.java
 
-repos/mall-agent/src/main/java/com/aim/mall/agent/
+mall-agent/src/main/java/com/aim/mall/agent/
 ├── controller/
 │   ├── AgentController.java           # 对外接口
 │   └── inner/
@@ -337,7 +336,7 @@ repos/mall-agent/src/main/java/com/aim/mall/agent/
 └── config/
     └── FeignConfig.java
 
-repos/mall-user/src/main/java/com/aim/mall/user/
+mall-user/src/main/java/com/aim/mall/user/
 ├── controller/
 │   └── inner/
 │       └── UserInnerController.java  # 内部 Feign 接口（/inner/api/v1/）

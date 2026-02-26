@@ -23,12 +23,9 @@
 |--------|------------------------|-------------------------------|---------|
 | 知识库查询 | `knowledge-base-query.md` | **统一查询 repowiki 知识库**，支持功能档案、技术规范、API文档、框架文档等 | 任何需要查询时 |
 | 业务功能归档 | `feature-archiving.md` | 将已完成功能归档到 repowiki，支持下次迭代复用   | 功能完成后   |
-| ~~功能检索~~   | ~~`feature-retrieval.md`~~ | ~~【已废弃】请使用 `knowledge-base-query`~~ | - |
-| ~~离线文档查询~~ | ~~`offline-doc-query.md`~~ | ~~【已废弃】请使用 `knowledge-base-query`~~ | - |
-
 ---
 
-## 什么是 Skill
+## Skill 定义
 
 Skill 是**可复用的能力模块**，特点：
 
@@ -39,7 +36,7 @@ Skill 是**可复用的能力模块**，特点：
 
 ---
 
-## 如何使用 Skill
+## Skill 使用方式
 
 ### 方式一：主 Agent 直接调用
 

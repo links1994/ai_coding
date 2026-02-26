@@ -270,7 +270,7 @@ Agent:
 ### 场景 2: 技术规范查询
 
 ```
-用户: "错误码应该怎么定义？"
+用户: "错误码应当如何定义？"
 
 Agent:
   → 调用 knowledge-base-query Skill
@@ -295,7 +295,7 @@ Agent:
 ### 场景 4: 框架用法查询
 
 ```
-用户: "mybatis-plus怎么写分页查询？"
+用户: "mybatis-plus分页查询如何实现？"
 
 Agent:
   → 调用 knowledge-base-query Skill
@@ -307,7 +307,7 @@ Agent:
 ### 场景 5: 不确定内容时的综合查询
 
 ```
-用户: "怎么设计岗位类型的错误码？"
+用户: "岗位类型错误码如何设计？"
 
 Agent:
   → 调用 knowledge-base-query Skill

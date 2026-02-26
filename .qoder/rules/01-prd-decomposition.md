@@ -25,73 +25,47 @@ PRD 功能模块
 
 | 归属           | 判断标准           | 输出标记           | 代码路径                                     |
 |--------------|----------------|----------------|------------------------------------------|
-| **门面服务-管理端** | 供管理后台调用的接口     | `[mall-admin]` | `repos/mall-admin/.../admin/controller/` |
-| **门面服务-客户端** | 供 APP/商家端调用的接口 | `[mall-app]`   | `repos/mall-app/.../app/controller/`     |
-| **门面服务-AI对话** | AI 对话功能，直接调用大模型 | `[mall-chat]`  | `repos/mall-chat/.../chat/controller/`   |
-| **智能员工服务**   | 智能员工核心业务逻辑     | `[mall-agent]` | `repos/mall-agent/.../agent/`            |
-| **用户服务**     | 用户相关数据操作       | `[mall-user]`  | `repos/mall-user/.../user/`              |
-| **数据库**      | 表结构设计、DDL      | `[DB]`         | `repos/{服务}/src/main/resources/db/`      |
+| **门面服务-管理端** | 供管理后台调用的接口     | `[mall-admin]` | `mall-admin/.../admin/controller/` |
+| **门面服务-客户端** | 供 APP/商家端调用的接口 | `[mall-app]`   | `mall-app/.../app/controller/`     |
+| **门面服务-AI对话** | AI 对话功能，直接调用大模型 | `[mall-chat]`  | `mall-chat/.../chat/controller/`   |
+| **智能员工服务**   | 智能员工核心业务逻辑     | `[mall-agent]` | `mall-agent/.../agent/`            |
+| **用户服务**     | 用户相关数据操作       | `[mall-user]`  | `mall-user/.../user/`              |
+| **数据库**      | 表结构设计、DDL      | `[DB]`         | `{服务}/src/main/resources/db/`      |
 | **跨服务共享**    | DTO、Feign 接口定义 | `[SHARED]`      | 各服务的 `dto/` `feign/` 包                     |
 
 **数据库设计规范参考**：详细的数据库字段类型、字符集、通用字段等规范见 `05-architecture-standards.md` 数据库设计章节
 
-### 3. 架构设计约束（设计阶段确定）
+### 3. 架构设计约束
 
-**3.1 四层架构强制要求**
-- 必须严格遵循：接口层→应用层→领域层→基础设施层
-- 禁止跨层直接调用，必须通过接口抽象
-- 高层模块不依赖低层模块的具体实现
-- 依赖倒置原则
+> **详细规范参考**：`.qoder/rules/05-architecture-standards.md`
 
-**3.2 服务职责划分**
+#### 3.1 服务类型定义
 
-- **QueryService**：只读、无状态、数据聚合与转换，仅调用 Mapper 查询
-- **ManageService**：写操作流程编排、事务管理、参数校验，可调用其他 Service 或 Mapper 进行 CUD
-- **DomainService**：多实体协作的复杂业务逻辑，禁止直接调用 Mapper
+| 术语 | 英文 | 定义 | 调用方 |
+|------|------|------|--------|
+| **门面服务** | Facade Service | 直接面向前端的服务，接收 HTTP 请求 | 前端应用 |
+| **应用服务** | Application Service | 后端内部服务，通过 Feign 供门面服务调用 | 门面服务、其他应用服务 |
+| **支撑服务** | Support Service | 提供基础能力的应用服务 | 应用服务 |
 
-**3.3 模块类型设计规范**
+#### 3.2 核心约束
 
-- **门面模块**：区分用户端(/app/api/v1/)和管理端(/admin/api/v1/)路径
-- **服务模块**：统一使用 /inner/api/v1/ 路径，供其他服务 RPC 调用
-- **DO 类命名**：严格按表名转换为大驼峰+DO 后缀（如：aim_product_info → AimProductInfoDO）
-
-**3.4 分层接口风格规范**
-
-| 服务类型     | 风格      | 方法                  | 路径前缀                              | 职责        |
-|----------|---------|---------------------|-----------------------------------|-----------|
-| **门面服务-管理端** | RESTful | GET/POST/PUT/DELETE | `/admin/api/v1/` | 参数校验、请求转发 |
-| **门面服务-客户端** | RESTful | GET/POST/PUT/DELETE | `/app/api/v1/` | 参数校验、请求转发 |
-| **门面服务-AI对话** | RESTful | GET/POST | `/app/api/v1/` | AI 对话、流式响应 |
-| **应用服务** | 简化      | GET/POST            | `/inner/api/v1/`                  | 业务逻辑处理    |
-
-**特殊说明**：mall-chat 作为 AI 对话门面服务，可直接调用大模型 API，同时可调用 mall-agent 获取配置信息。
-
-**调用关系**：
-
+**分层调用关系**：
 ```
 前端 → 门面服务（参数校验）→ Feign → 应用服务（业务逻辑）
 ```
 
 **关键约束**：
-
 - 前端**禁止**直接调用应用服务
 - 参数必要性校验在门面层完成
 - 应用服务专注业务逻辑，信任门面层已做基础校验
 
-**3.5 API 路径参数规范**
+#### 3.3 路径与参数规范（摘要）
 
-**门面层（mall-admin/mall-app/mall-chat）**：
-
-- 允许使用路径参数，但**最多只有一个**
-- 路径参数必须放在 URL 最后
-- 推荐格式：`/resource/{id}/action` 或 `/resource/{id}`
-
-**应用层（mall-agent/mall-user 等）- Feign 调用**：
-
-- **禁止在 URL 中使用路径参数**
-- 所有参数通过 Query 参数或 RequestBody 传递
-- 查询类：使用 Query 参数（GET 请求）
-- 操作类：使用 RequestBody（POST 请求）
+| 服务类型 | 路径前缀 | 参数规则 |
+|----------|----------|----------|
+| **门面服务-管理端** | `/admin/api/v1/` | GET可用多个@RequestParam，POST用@RequestBody，允许一个路径参数 |
+| **门面服务-客户端** | `/app/api/v1/` | 同上 |
+| **应用服务** | `/inner/api/v1/` | ≤2个基础类型用@RequestParam，否则一律@RequestBody，禁止路径参数 |
 
 **示例**：
 
@@ -210,7 +184,7 @@ graph TD
 
 ### 需求概述
 
-- **来源**: PRD 文档 / 一句话描述
+- **来源**: PRD 文档 / 简要需求描述
 - **功能模块**: xxx
 - **涉及服务**: mall-admin, mall-app, mall-agent, mall-user
 
@@ -220,7 +194,7 @@ graph TD
 
 - **来源**: PRD 第 2.1 节
 - **描述**: 管理后台创建智能员工
-- **代码位置**: `repos/mall-admin/src/main/java/com/aim/mall/admin/controller/AgentAdminController.java`
+- **代码位置**: `mall-admin/src/main/java/com/aim/mall/admin/controller/AgentAdminController.java`
 - **接口路径**: `POST /admin/api/v1/ai-employee`
 - **依赖模块**:
   - 依赖服务: mall-agent
@@ -234,7 +208,7 @@ graph TD
 
 - **来源**: PRD 第 2.2 节
 - **描述**: APP 端获取智能员工列表
-- **代码位置**: `repos/mall-app/src/main/java/com/aim/mall/app/controller/AgentAppController.java`
+- **代码位置**: `mall-app/src/main/java/com/aim/mall/app/controller/AgentAppController.java`
 - **接口路径**: `GET /app/api/v1/ai-employee/list`
 - **依赖模块**:
   - 依赖服务: mall-agent
@@ -248,7 +222,7 @@ graph TD
 
 - **来源**: PRD 第 2.1/2.2 节
 - **描述**: 智能员工核心业务逻辑实现
-- **代码位置**: `repos/mall-agent/src/main/java/com/aim/mall/agent/service/AgentService.java`
+- **代码位置**: `mall-agent/src/main/java/com/aim/mall/agent/service/AgentService.java`
 - **Inner 接口路径**:
   - `POST /inner/api/v1/ai-employee/create`
   - `GET /inner/api/v1/ai-employee/list`
@@ -265,7 +239,7 @@ graph TD
 
 - **来源**: PRD 第 2.1/2.2 节
 - **描述**: 提供用户信息查询接口供 mall-agent 调用
-- **代码位置**: `repos/mall-user/src/main/java/com/aim/mall/user/feign/UserFeignService.java`
+- **代码位置**: `mall-user/src/main/java/com/aim/mall/user/feign/UserFeignService.java`
 - **Inner 接口路径**: `GET /inner/api/v1/user/detail?userId={userId}`
 - **依赖模块**:
   - 依赖服务: 无
@@ -279,7 +253,7 @@ graph TD
 
 - **来源**: PRD 第 2.1 节
 - **描述**: 设计智能员工数据表
-- **代码位置**: `repos/mall-agent/src/main/resources/db/V001__create_agent.sql`
+- **代码位置**: `mall-agent/src/main/resources/db/V001__create_agent.sql`
 - **涉及表**: aim_employee
 - **依赖模块**:
   - 被依赖: REQ-003, REQ-004

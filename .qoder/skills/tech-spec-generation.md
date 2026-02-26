@@ -12,7 +12,7 @@ output_language: 中文
 
 基于需求分解和澄清结果，生成详细的技术规格书（design.md）。支持迭代修正：当设计不满足要求时，接受用户补充上下文或修改意见，并智能判断是否需要同步更新需求文档。
 
-> **注意**：本 Skill 遵循的规范定义在 `.qoder/rules/03-tech-spec-generation.md` 和 `.qoder/rules/05-architecture-standards.md`。
+> **规范引用**：本 Skill 遵循的规范定义在 `.qoder/rules/03-tech-spec-generation.md` 和 `.qoder/rules/05-architecture-standards.md`。
 
 ---
 
@@ -84,7 +84,7 @@ output_language: 中文
 - [ ] 当不确定任何技术细节时，优先使用知识库查询
 
 ### 2.2 现有数据库设计
-- [ ] 读取 repos/{service}/src/main/resources/db/ 现有表结构
+- [ ] 读取 {service}/src/main/resources/db/ 现有表结构（相对于项目根目录）
 - [ ] 识别需要复用的表
 - [ ] 识别需要新增的表
 - [ ] 识别需要修改的表（字段变更）
@@ -104,7 +104,7 @@ output_language: 中文
 
 按以下结构生成 `orchestrator/PROGRAMS/{current_program_id}/workspace/tech-spec.md`：
 
-> 注意：针对单个 REQ 生成精简版技术规格，而非完整系统设计
+> 规范说明：针对单个 REQ 生成精简版技术规格，而非完整系统设计
 
 ```markdown
 # 技术规格书
@@ -203,7 +203,7 @@ User: 需要参考现有的用户表结构
 
 Agent: 请提供现有用户表结构信息，或告诉我表结构文档路径
 
-User: 路径是 repos/mall-user/.../db/V001__user.sql
+User: 路径是 mall-user/.../db/V001__user.sql
 
 Agent: 
 1. 读取提供的表结构

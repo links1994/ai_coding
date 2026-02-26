@@ -117,7 +117,7 @@ D. 其他（请描述具体需求）
 
 #### 3.4 实时更新文档
 
-每确认一个问题，**立即更新** `questions/{req_id}.md` 和 `answers/{req_id}.md`：
+每确认一个问题，**实时更新** `questions/{req_id}.md` 和 `answers/{req_id}.md`：
 
 ```markdown
 ## 问题列表（实时更新）

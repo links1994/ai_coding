@@ -1,20 +1,20 @@
 ---
 name: prd-decomposition
-description: 根据 PRD 或一句话描述进行需求拆解，生成包含子需求详细信息和依赖关系的需求分解文档
+description: 根据 PRD 或简要需求描述进行需求拆解，生成包含子需求详细信息和依赖关系的需求分解文档
 tools: Read, Write, Grep
 ---
 
 # PRD 需求分解 Skill
 
-根据输入的 PRD 文档或一句话描述，按照规范进行需求拆解，生成包含子需求详细信息、依赖关系、代码位置、数据库表设计的需求分解文档。
+根据输入的 PRD 文档或简要需求描述，按照规范进行需求拆解，生成包含子需求详细信息、依赖关系、代码位置、数据库表设计的需求分解文档。
 
-> **注意**：本 Skill 遵循的规范定义在 `.qoder/rules/01-prd-decomposition.md`，包括服务归属判断规则、架构设计约束、服务调用关系等。
+> **规范引用**：本 Skill 遵循的规范定义在 `.qoder/rules/01-prd-decomposition.md`，包括服务归属判断规则、架构设计约束、服务调用关系等。
 
 ---
 
 ## 触发条件
 
-- 用户提供了 PRD 文档路径或一句话需求描述
+- 用户提供了 PRD 文档路径或简要需求描述
 - 用户明确指令："分解需求" 或 "委托: 需求分解"
 - 主 Agent 在 Phase 1 调用
 
@@ -22,7 +22,7 @@ tools: Read, Write, Grep
 
 ## 输入
 
-- PRD 文档路径（如 `inputs/prd/xxx-prd.md`）或一句话需求描述
+- PRD 文档路径（如 `inputs/prd/xxx-prd.md`）或简要需求描述
 - `orchestrator/ALWAYS/RESOURCE-MAP.yml` — 项目资源映射
 - `.qoder/rules/01-prd-decomposition.md` — 需求拆分规范
 
@@ -66,7 +66,7 @@ P-2026-001-REQ-031/                 # 用户命令创建
 
 ### Step 1: 读取输入
 
-1. 读取 PRD 文档或解析一句话描述
+1. 读取 PRD 文档或解析简要需求描述
 2. 读取项目资源映射（RESOURCE-MAP.yml）
 3. 读取需求拆分规范（01-prd-decomposition.md）
 
@@ -120,7 +120,7 @@ P-2026-001-REQ-031/                 # 用户命令创建
 
 ### 需求概述
 
-- **来源**: PRD 文档 / 一句话描述
+- **来源**: PRD 文档 / 简要需求描述
 - **功能模块**: xxx
 - **涉及服务**: mall-admin, mall-app, mall-agent, mall-user
 
@@ -130,7 +130,7 @@ P-2026-001-REQ-031/                 # 用户命令创建
 
 - **来源**: PRD 第 X.X 节
 - **描述**: xxx
-- **代码位置**: `repos/mall-admin/src/main/java/com/aim/mall/admin/controller/xxx.java`
+- **代码位置**: `mall-admin/src/main/java/com/aim/mall/admin/controller/xxx.java`
 - **接口路径**: `POST /admin/api/v1/xxx`
 - **依赖模块**:
   - 依赖服务: mall-agent
@@ -143,7 +143,7 @@ P-2026-001-REQ-031/                 # 用户命令创建
 
 - **来源**: PRD 第 X.X 节
 - **描述**: xxx
-- **代码位置**: `repos/mall-app/src/main/java/com/aim/mall/app/controller/xxx.java`
+- **代码位置**: `mall-app/src/main/java/com/aim/mall/app/controller/xxx.java`
 - **接口路径**: `GET /app/api/v1/xxx`
 - **依赖模块**:
   - 依赖服务: mall-agent
@@ -156,7 +156,7 @@ P-2026-001-REQ-031/                 # 用户命令创建
 
 - **来源**: PRD 第 X.X 节
 - **描述**: xxx
-- **代码位置**: `repos/mall-agent/src/main/java/com/aim/mall/agent/service/xxx.java`
+- **代码位置**: `mall-agent/src/main/java/com/aim/mall/agent/service/xxx.java`
 - **Inner 接口路径**: `POST /inner/api/v1/xxx`
 - **依赖模块**:
   - 依赖服务: mall-user
@@ -169,7 +169,7 @@ P-2026-001-REQ-031/                 # 用户命令创建
 
 - **来源**: PRD 第 X.X 节
 - **描述**: xxx
-- **代码位置**: `repos/mall-user/src/main/java/com/aim/mall/user/feign/xxx.java`
+- **代码位置**: `mall-user/src/main/java/com/aim/mall/user/feign/xxx.java`
 - **Inner 接口路径**: `GET /inner/api/v1/xxx`
 - **依赖模块**:
   - 依赖服务: 无
@@ -182,7 +182,7 @@ P-2026-001-REQ-031/                 # 用户命令创建
 
 - **来源**: PRD 第 X.X 节
 - **描述**: 设计 xxx 数据表
-- **代码位置**: `repos/mall-agent/src/main/resources/db/Vxxx__xxx.sql`
+- **代码位置**: `mall-agent/src/main/resources/db/Vxxx__xxx.sql`
 - **涉及表**:
   - `xxx_table`: xxx 表
 - **依赖模块**:

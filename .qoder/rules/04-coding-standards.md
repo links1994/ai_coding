@@ -46,15 +46,26 @@ public class AgentCreateRequest implements Serializable {
 }
 ```
 
-**注意**：`serialVersionUID` 统一设置为 `-1L`。
+**规范要求**：`serialVersionUID` 统一设置为 `-1L`。
 
 ### 1.4 时间格式化
 
-`LocalDateTime` 字段必须使用 `@JsonFormat` 注解：
+**`LocalDateTime` 字段 `@JsonFormat` 使用规则**：
+
+| 对象类型 | 是否需要 `@JsonFormat` | 说明 |
+|----------|------------------------|------|
+| **DO (AimXxxDO)** | ❌ 不需要 | 数据库实体，不涉及序列化 |
+| **DTO (AimXxxDTO)** | ❌ 不需要 | 内部数据传输，不直接返回 |
+| **Response (XxxResponse)** | ✅ 必须 | 直接返回给前端，需要格式化 |
+| **VO (XxxVO)** | ✅ 必须 | 视图对象，直接返回给前端 |
 
 ```java
+// ✅ Response/VO 中使用
 @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-private LocalDateTime createdAt;
+private LocalDateTime createTime;
+
+// ✅ DO/DTO 中不使用
+private LocalDateTime createTime;
 ```
 
 ---
@@ -69,16 +80,33 @@ private LocalDateTime createdAt;
 
 根据查询类型确定返回对象：
 
-| 查询类型 | Mapper返回 | Service返回 | 转换为 |
-|----------|------------|-------------|--------|
-| **单表查询** | `XxxDO` | `XxxDO` | `XxxResponse` (Controller层转换) |
-| **联表查询** | `XxxDTO` | `XxxDTO` | `XxxResponse` (Controller层转换) |
+| 查询类型 | Mapper返回 | Service返回 | 说明 |
+|----------|------------|-------------|------|
+| **单表查询** | `AimXxxDO` | `CommonResult<CommonResult.PageData<XxxResponse>>` | Service层完成DO到Response转换 |
+| **联表查询** | `AimXxxDTO` | `CommonResult<CommonResult.PageData<XxxResponse>>` | Service层完成DTO到Response转换 |
 
 **规范说明：**
-1. **单表查询**：直接返回DO，在Controller层转换为Response
-2. **联表查询**：返回DTO（包含关联数据），在Controller层转换为Response
-3. **Service层职责**：返回DO或DTO，不负责转换为Response
-4. **Controller层职责**：将DO/DTO转换为Response后返回
+1. **单表查询**：Mapper返回DO，Service转换为Response后返回
+2. **联表查询**：Mapper返回DTO，Service转换为Response后返回
+3. **QueryService职责**：只读查询，封装查询逻辑（小表用 MP 分页，大表用游标/索引覆盖分页）
+4. **ManageService职责**：增删改操作，封装写逻辑（直接使用 MP IService）
+5. **Controller层职责**：参数转换（Request→Query/DTO）+ 调用Service + 直接返回
+
+#### 新增/更新返回规范
+
+**Service 层新增/更新方法返回类型**：
+
+| 操作类型 | Service返回 | 说明 |
+|----------|-------------|------|
+| **新增** | `int` / `boolean` / `Long` | 返回影响行数、是否成功、或新记录ID |
+| **更新** | `int` / `boolean` | 返回影响行数或是否成功 |
+| **删除** | `int` / `boolean` | 返回影响行数或是否成功 |
+
+**规范说明：**
+1. **不返回完整对象**：新增/更新操作不需要返回完整的实体对象
+2. **返回操作结果**：返回影响行数、是否成功标志、或新记录ID
+3. **查询和修改分离**：需要获取更新后数据时，单独调用查询方法
+4. **InnerController 转换**：Service 返回操作结果，Controller 根据结果构建 Response
 
 **DDD风格例外**：
 - 如果采用DDD（领域驱动设计）风格，可以不完全遵循上述模式
@@ -86,11 +114,33 @@ private LocalDateTime createdAt;
 
 ### 2.2 数据库访问规范
 
+**SQL 编写方式**：
+
+- **优先使用 XML Mapper**：SQL 统一放在 `src/main/resources/mapper/` 目录下的 `AimXxxMapper.xml` 文件中
+- **禁止在注解中写复杂 SQL**：`@Select`、`@Insert`、`@Update`、`@Delete` 注解仅用于极简单的单表操作
+- **XML 中必须抽取重复 SQL**：使用 `<sql>` 标签定义可复用的 SQL 片段
+
+**MyBatis-Plus 使用规则**：
+
+| 场景 | 调用方 | 实现方 | 说明 |
+|------|--------|--------|------|
+| **增删改** | `XxxManageService` | `AimXxxService` (MP) | 使用 MP IService 提供的 `save()`/`updateById()`/`removeById()` |
+| **小表分页** (< 100万) | `XxxQueryService` | `AimXxxService` (MP) | 使用 MP `page()` 方法 |
+| **大表分页** (>= 100万) | `XxxQueryService` | `AimXxxService` → `AimXxxMapper` | AimXxxService 封装索引覆盖分页逻辑 |
+| **非分页查询** | `XxxQueryService` | `AimXxxService` → `AimXxxMapper` | AimXxxService 封装原生 MyBatis XML 查询 |
+
+**分层调用原则**：
+- **XxxQueryService / XxxManageService** 只能调用 `AimXxxService`
+- **AimXxxService** 封装所有数据访问，包括 MP 方法和原生 Mapper 调用
+- **AimXxxMapper** 只对 `AimXxxService` 暴露，其他层禁止直接调用
+
 **禁止使用的特性**：
 
-- `QueryWrapper` / `LambdaQueryWrapper`
+- `QueryWrapper` / `LambdaQueryWrapper`（非分页查询场景）
 - `SELECT *`
-- MyBatis 的 `<script>` 标签
+- MyBatis 的 `<script>` 标签（注解方式）
+- 在 Mapper 接口注解中写复杂 SQL（超过一行或包含动态条件）
+- XxxQueryService / XxxManageService 直接调用 AimXxxMapper
 
 ### 2.3 批量操作规范
 
@@ -110,22 +160,31 @@ private LocalDateTime createdAt;
 
 #### 类命名
 
-| 类型 | 命名规则 | 示例 | 说明 |
-|------|----------|------|------|
-| 实体类 | 大驼峰 + DO 后缀 | `AgentDO`、`UserDO` | 数据库实体 |
-| VO | 大驼峰 + VO 后缀 | `AgentVO` | 视图对象 |
-| Request | 大驼峰 + Request 后缀 | `AgentCreateRequest` | **仅用于Controller层入参** |
-| Response | 大驼峰 + Response 后缀 | `AgentResponse` | **仅用于Controller层出参** |
-| Query | 大驼峰 + Query 后缀 | `AgentListQuery` | **Service层查询参数**，用于解耦 |
-| DTO | 大驼峰 + DTO 后缀 | `AgentDTO` | 内部数据传输对象 |
-| Service | 大驼峰 + Service 后缀 | `AgentService` | 服务接口 |
-| ServiceImpl | 大驼峰 + ServiceImpl 后缀 | `AgentServiceImpl` | 服务实现 |
-| Mapper | 大驼峰 + Mapper 后缀 | `AgentMapper` | 数据访问层 |
-| Controller | 大驼峰 + Controller 后缀 | `AgentController` | 控制器 |
-| FeignClient | 大驼峰 + FeignClient 后缀 | `AgentFeignClient` | Feign客户端 |
-| Config | 大驼峰 + Config 后缀 | `FeignConfig` | 配置类 |
-| Exception | 大驼峰 + Exception 后缀 | `BusinessException` | 异常类 |
-| Enum | 大驼峰 + Enum 后缀 | `AgentStatusEnum` | 枚举类 |
+| 类型 | 命名规则 | 示例 | 所属模块 | 说明 |
+|------|----------|------|----------|------|
+| 实体类 | 大驼峰 + DO 后缀 | `AimAgentDO`、`AimUserDO` | 应用服务 | 数据库实体，统一前缀 Aim |
+| VO | 大驼峰 + VO 后缀 | `AgentVO` | 门面服务 | 视图对象，仅门面服务使用 |
+| 远程 Request | 大驼峰 + ApiRequest 后缀 | `AgentCreateApiRequest` | API 模块 | 远程调用请求参数 |
+| 远程 Response | 大驼峰 + ApiResponse 后缀 | `AgentApiResponse` | API 模块 | 远程调用返回值 |
+| 前端 Request | 大驼峰 + Request 后缀 | `AgentCreateRequest` | 门面服务 | 前端请求参数（本地使用） |
+| 前端 Response | 大驼峰 + Response 后缀 | `AgentResponse` | 门面服务 | 前端返回值（本地使用） |
+| Query | 大驼峰 + Query 后缀 | `AgentListQuery` | 应用服务 | **Service层内部查询参数**（仅内部使用） |
+| DTO | 大驼峰 + DTO 后缀 | `AgentDTO` | 应用服务 | 内部数据传输对象 |
+| DomainService | 大驼峰 + DomainService 后缀 | `AgentDomainService` | 应用服务 | 业务域服务 |
+| QueryService | 大驼峰 + QueryService 后缀 | `AgentQueryService` | 应用服务 | 查询服务 |
+| ManageService | 大驼峰 + ManageService 后缀 | `AgentManageService` | 应用服务 | 管理服务 |
+| AimService | Aim + 大驼峰 + Service 后缀 | `AimAgentService` | 应用服务 | MP数据服务，继承IService |
+| Mapper | Aim + 大驼峰 + Mapper 后缀 | `AimAgentMapper` | 应用服务 | 数据访问层 |
+| Controller | 大驼峰 + Controller 后缀 | `AgentController` | 门面/应用 | 控制器 |
+| FeignClient | 大驼峰 + FeignClient 后缀 | `AgentFeignClient` | API 模块 | Feign客户端 |
+| Config | 大驼峰 + Config 后缀 | `FeignConfig` | 任意 | 配置类 |
+| Exception | 大驼峰 + Exception 后缀 | `BusinessException` | 应用服务 | 异常类 |
+| Enum | 大驼峰 + Enum 后缀 | `AgentStatusEnum` | 应用服务/API | 枚举类 |
+
+**强制约束**：
+- **Controller 层**：请求参数必须以 `Request` 结尾，返回参数必须以 `Response` 或 `VO` 结尾
+- **Service 层内部**：请求参数以 `Query` 结尾，返回以 `DTO` 结尾
+- **禁止混用**：Controller 层不得使用 `Query` 或 `DTO` 作为参数/返回类型后缀
 
 #### 方法命名
 
@@ -133,7 +192,7 @@ private LocalDateTime createdAt;
 |------|----------|------|
 | 查询单个 | `getById`、`getByXXX` | `getById(Long id)` |
 | 查询列表 | `listXXX`、`queryXXX` | `listByStatus(Integer status)` |
-| 分页查询 | `pageXXX` | `pageAgents(AgentQueryRequest request)` |
+| 分页查询 | `pageXxx` | `pageAgent(AgentQuery query)` |
 | 创建 | `createXXX`、`save` | `createAgent(AgentCreateRequest request)` |
 | 更新 | `updateXXX` | `updateAgent(AgentUpdateRequest request)` |
 | 删除 | `deleteXXX`、`remove` | `deleteById(Long id)` |
@@ -190,41 +249,107 @@ private boolean active;     // 布尔值无前缀
 
 **严格区分以下对象类型：**
 
-| 对象类型 | 包位置 | 使用场景 | 命名示例 |
-|----------|--------|----------|----------|
-| **Request** | `api/dto/request/` | **仅Controller层入参** | `JobTypeCreateRequest` |
-| **Response** | `api/dto/response/` | **仅Controller层出参** | `JobTypeResponse` |
-| **Query** | `domain/dto/` | **Service层查询参数**，Controller到Service的转换 | `JobTypeListQuery` |
-| **DTO** | `domain/dto/` | **内部数据传输**，Service层内部使用 | `JobTypeDTO` |
+| 对象类型 | 包位置 | 使用场景 | 命名示例 | 使用服务 |
+|----------|--------|----------|----------|----------|
+| **Request** | `api/dto/request/` | **仅Controller层入参** | `JobTypeCreateRequest` | 门面服务 |
+| **Response** | `api/dto/response/` | **Controller层出参** | `JobTypeResponse` | 所有服务 |
+| **VO** | `api/dto/vo/` | **聚合多个Response**（仅门面服务） | `JobTypeDetailVO` | 仅门面服务 |
+| **Query** | `domain/dto/` | **Service层查询参数** | `JobTypeListQuery` | 应用服务 |
+| **DTO** | `domain/dto/` | **内部数据传输** | `JobTypeDTO` | 应用服务 |
 
 **关键约束：**
+
 1. **Request/Response 仅用于Controller层**，不直接传递到Service层
-2. **Controller层负责转换**：`XxxRequest` → `XxxQuery`/`XxxDTO` → 调用Service
-3. **Service层使用Query/DTO**：Service接口入参只能是 `XxxQuery` 或 `XxxDTO`，不能是 `XxxRequest`
-4. **非对外对象不要放在api目录**：内部使用的DTO统一放在 `domain/dto/`
+2. **VO 仅用于门面服务**：当需要聚合多个应用服务的 Response 时使用
+3. **Controller层负责转换**：`XxxRequest` → `XxxQuery`/`XxxDTO` → 调用Service
+4. **Service层使用Query/DTO**：Service接口入参只能是 `XxxQuery` 或 `XxxDTO`，不能是 `XxxRequest`
+5. **非对外对象不要放在api目录**：内部使用的DTO统一放在 `domain/dto/`
+
+**VO 使用场景**（仅门面服务）：
+
+```java
+// 门面服务：聚合多个本地 Response（从 ApiResponse 转换而来）
+@Data
+public class AgentDetailVO implements Serializable {
+    private AgentResponse agent;           // 本地 Response（从 AgentApiResponse 转换）
+    private UserResponse creator;          // 本地 Response（从 UserApiResponse 转换）
+    private List<SkillResponse> skills;    // 本地 Response（从 SkillApiResponse 转换）
+}
+```
 
 ### 3.3 参数注解规范
 
+#### 门面服务参数规则（mall-admin/mall-app）
+
+门面服务直接面向前端，参数传递灵活：
+
 ```java
-// 路径参数
-@GetMapping("/{id}")
-public CommonResult<AgentVO> getById(@PathVariable("id") Long id)
-
-// Query 参数
+// ✅ GET + 多个 RequestParam（适合简单查询）
 @GetMapping("/list")
-public CommonResult<List<AgentVO>> listByStatus(
-    @RequestParam(name = "status", required = false) Integer status)
+public CommonResult<CommonResult.PageData<AgentResponse>> pageAgent(
+        @RequestParam(name = "keyword", required = false) String keyword,
+        @RequestParam(name = "status", required = false) Integer status,
+        @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
+        @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+    // Feign 返回 ApiResponse，转换为本地 Response
+    CommonResult<CommonResult.PageData<AgentApiResponse>> result = 
+        agentFeignClient.pageAgent(keyword, status, pageNum, pageSize);
+    return convertToPageResponse(result);
+}
 
-// RequestBody
-@PostMapping("/create")
-public CommonResult<Long> create(
-    @RequestBody @Valid AgentCreateRequest request)
+// ✅ POST + RequestBody（适合复杂查询或多参数）
+@PostMapping("/search")
+public CommonResult<CommonResult.PageData<AgentResponse>> pageAgent(
+        @RequestBody @Valid AgentListRequest request) {
+    // Feign 返回 ApiResponse，转换为本地 Response
+    CommonResult<CommonResult.PageData<AgentApiResponse>> result = 
+        agentFeignClient.pageAgent(request);
+    return convertToPageResponse(result);
+}
 
-// RequestHeader
-@PostMapping("/create")
-public CommonResult<Long> create(
-    @RequestHeader(USER_TOKEN_HEADER) String user,
-    @RequestBody @Valid AgentCreateRequest request)
+// ✅ 路径参数（最多一个，放在URL最后）
+@GetMapping("/{agentId}")
+public CommonResult<AgentResponse> getAgentById(@PathVariable("agentId") Long agentId) {
+    // Feign 返回 ApiResponse，转换为本地 Response
+    AgentApiResponse apiResponse = agentFeignClient.getAgentById(agentId).getData();
+    return CommonResult.success(convertToAgentResponse(apiResponse));
+}
+```
+
+#### 应用服务参数规则（mall-agent/mall-user）
+
+应用服务仅供内部 Feign 调用，参数封装严格：
+
+```java
+// ✅ 参数 ≤2 个且为基础类型：使用 RequestParam
+@GetMapping("/detail")
+public CommonResult<AgentApiResponse> getAgentById(
+        @RequestParam("agentId") Long agentId) {
+    return agentService.getById(agentId);
+}
+
+// ✅ 参数 >2 个或包含对象：一律使用 RequestBody
+@PostMapping("/list")
+public CommonResult<CommonResult.PageData<AgentApiResponse>> pageAgent(
+        @RequestBody @Valid AgentListApiRequest request) {
+    return agentService.pageAgent(request);
+}
+
+// ❌ 错误：参数超过2个仍使用 RequestParam
+@GetMapping("/list")
+public CommonResult<CommonResult.PageData<AgentApiResponse>> pageAgent(
+        @RequestParam(name = "keyword", required = false) String keyword,
+        @RequestParam(name = "status", required = false) Integer status,
+        @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
+        @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+    // 错误！应该封装成 RequestBody
+}
+
+// ❌ 错误：应用服务禁止路径参数
+@GetMapping("/{agentId}/detail")
+public CommonResult<AgentApiResponse> getAgentById(@PathVariable("agentId") Long agentId) {
+    // 错误！应该使用 @RequestParam("agentId")
+}
 ```
 
 ### 3.4 Swagger 文档注解
@@ -263,7 +388,7 @@ public class AgentController {
 
 ### 4.2 异常处理规范
 
-由于有全局异常捕获（[GlobalExceptionHandler](file://d:/workspace/new_code/ai-coding/ai_coding/repos/mall-agent/src/main/java/com/aim/mall/agent/config/GlobalExceptionHandler.java)），Controller 层**不捕获任何异常**，直接抛出由全局处理器统一处理：
+由于有全局异常捕获（`GlobalExceptionHandler`），Controller 层**不捕获任何异常**，直接抛出由全局处理器统一处理：
 
 ```java
 @PostMapping("/create")
@@ -329,12 +454,9 @@ CommonResult.failed(errorCode, "错误信息")     // 错误码 + 自定义消�
 ```java
 @GetMapping("/list")
 @Operation(summary = "查询智能员工列表")
-public CommonResult<List<AgentResponse>> listAgents() {
-    List<Agent> agents = agentService.listAll();
-    List<AgentResponse> responses = agents.stream()
-        .map(this::convertToResponse)
-        .collect(Collectors.toList());
-    return CommonResult.success(responses);
+public CommonResult<List<AgentApiResponse>> listAllAgents() {
+    // Service层完成DO到Response的转换
+    return agentService.listAllAgents();
 }
 ```
 
@@ -343,30 +465,33 @@ public CommonResult<List<AgentResponse>> listAgents() {
 ```java
 @GetMapping("/page")
 @Operation(summary = "分页查询智能员工")
-public CommonResult<CommonResult.PageData<AgentResponse>> pageAgents(
+public CommonResult<CommonResult.PageData<AgentApiResponse>> pageAgent(
         @RequestParam(defaultValue = "1") Integer current,
         @RequestParam(defaultValue = "10") Integer size) {
 
-    Page<Agent> page = agentService.page(current, size);
-    List<AgentResponse> responses = page.getRecords().stream()
-        .map(this::convertToResponse)
-        .collect(Collectors.toList());
+    // Controller 层只做参数转换和调用 Service，不做业务逻辑
+    AgentQuery query = new AgentQuery();
+    query.setPageNum(current);
+    query.setPageSize(size);
 
-    return CommonResult.pageSuccess(responses, page.getTotal());
+    // Service 层完成 DO 到 Response 的转换
+    return agentService.pageAgent(query);
 }
 ```
+
+**规范说明**：
+- **所有 Controller 返回必须是 Response 类型**
+- **数据转换（DO → Response）在 Service 层完成**，Controller 层不做业务逻辑
+- Controller 层职责：参数转换（Request → Query/DTO）+ 调用 Service + 直接返回
 
 **单个对象查询**：
 
 ```java
 @GetMapping("/{id}")
 @Operation(summary = "根据ID查询智能员工")
-public CommonResult<AgentResponse> getAgentById(@PathVariable("id") Long id) {
-    Agent agent = agentService.getById(id);
-    if (agent == null) {
-        return CommonResult.failed("AGENT_NOT_FOUND", "智能员工不存在");
-    }
-    return CommonResult.success(convertToResponse(agent));
+public CommonResult<AgentApiResponse> getAgentById(@PathVariable("id") Long id) {
+    // Service层完成DO到Response的转换，并处理不存在的情况
+    return agentService.getAgentById(id);
 }
 ```
 
@@ -376,27 +501,93 @@ public CommonResult<AgentResponse> getAgentById(@PathVariable("id") Long id) {
 
 ### 6.1 日志级别使用
 
-| 级别 | 使用场景 |
-|------|----------|
-| `ERROR` | 系统错误、异常、需要立即处理的问题 |
-| `WARN` | 警告、潜在问题、非预期的业务情况 |
-| `INFO` | 重要业务操作、状态变更 |
-| `DEBUG` | 调试信息、详细的执行过程 |
+| 级别 | 使用场景 | 示例 |
+|------|----------|------|
+| `ERROR` | 系统错误、异常、需要立即处理的问题 | 数据库连接失败、空指针异常 |
+| `WARN` | 警告、潜在问题、非预期的业务情况、暂时未实现的功能 | 脏数据、配置缺失、功能待实现 |
+| `INFO` | 重要业务操作、状态变更 | 创建成功、更新成功、删除成功 |
+| `DEBUG` | 调试信息、入口参数、详细的执行过程 | 方法入参、查询条件、执行步骤 |
 
 ### 6.2 日志内容规范
 
 ```java
-// 记录入口参数
-log.info("创建智能员工: {}", request);
+// ✅ 记录入口参数（DEBUG级别）
+log.debug("创建智能员工, request: {}", request);
 
-// 记录关键步骤
-log.info("调用用户服务查询用户信息, userId: {}", userId);
+// ✅ 记录关键步骤（DEBUG级别）
+log.debug("调用用户服务查询用户信息, userId: {}", userId);
 
-// 记录异常
+// ✅ 记录重要业务操作（INFO级别）
+log.info("创建智能员工成功, agentId: {}", agentId);
+
+// ✅ 记录异常（ERROR级别）
 log.error("创建智能员工失败, request: {}", request, e);
 
-// 记录性能信息
+// ✅ 记录性能信息（INFO级别）
 log.info("查询智能员工列表完成, 耗时: {}ms, 结果数: {}", duration, count);
+
+// ✅ 记录警告（WARN级别）
+log.warn("用户数据不完整, userId: {}, 缺失字段: {}", userId, missingFields);
+
+// ✅ 记录暂时未实现的功能（WARN级别）
+log.warn("功能暂未实现: {}", featureName);
+```
+
+### 6.3 分层日志规范
+
+#### Controller 层
+
+```java
+@PostMapping("/create")
+public CommonResult<Long> createAgent(@RequestBody @Valid AgentCreateRequest request) {
+    // 入口参数使用 DEBUG
+    log.debug("创建智能员工, request: {}", request);
+    
+    Long agentId = agentService.createAgent(request);
+    
+    // 成功操作使用 INFO
+    log.info("创建智能员工成功, agentId: {}", agentId);
+    return CommonResult.success(agentId);
+}
+```
+
+#### Service 层
+
+```java
+@Override
+@Transactional(rollbackFor = Exception.class)
+public Long createAgent(AgentCreateDTO dto) {
+    log.debug("创建智能员工开始, dto: {}", dto);
+    
+    // 参数校验
+    validateCreateRequest(dto);
+    
+    // 业务逻辑
+    AimAgentDO entity = convertToEntity(dto);
+    aimAgentService.save(entity);
+    
+    log.info("创建智能员工成功, agentId: {}", entity.getId());
+    return entity.getId();
+}
+```
+
+#### 异常处理
+
+```java
+// 全局异常处理器
+@ExceptionHandler(BusinessException.class)
+public CommonResult<Void> handleBusinessException(BusinessException e) {
+    // 业务异常使用 WARN（非系统错误）
+    log.warn("业务异常: {}", e.getMessage());
+    return CommonResult.error(e.getErrorCode());
+}
+
+@ExceptionHandler(Exception.class)
+public CommonResult<Void> handleException(Exception e) {
+    // 系统异常使用 ERROR
+    log.error("系统异常: {}", e.getMessage(), e);
+    return CommonResult.error(ErrorCodeEnum.SYSTEM_ERROR);
+}
 ```
 
 ---
@@ -409,7 +600,7 @@ log.info("查询智能员工列表完成, 耗时: {}ms, 结果数: {}", duration
 - [ ] 包路径符合服务类型（门面/应用/支撑）
 - [ ] 使用了正确的 Lombok 注解
 - [ ] Request/Response 实现了 Serializable
-- [ ] LocalDateTime 字段使用了 @JsonFormat
+- [ ] Response/VO 中的 LocalDateTime 字段使用了 @JsonFormat（DO/DTO 不需要）
 
 ### 代码生成后检查
 
