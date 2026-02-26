@@ -138,41 +138,27 @@ graph TD
 - 禁止跨层级调用（如应用服务直接调用门面服务）
 - 所有跨服务调用通过 OpenFeign 实现
 
-### 5. 依赖关系类型
+### 5. 依赖关系定义
 
-```yaml
-# dependencies.md 格式
-dependencies:
-  - from: "mall-admin 接口"
-    to: "mall-agent 服务"
-    type: "hard"
-    reason: "门面服务依赖应用服务提供业务逻辑"
+依赖关系直接记录在子需求中，不再单独生成 `dependencies.md` 文件。
 
-  - from: "mall-agent 服务"
-    to: "mall-user 服务"
-    type: "hard"
-    reason: "智能员工服务需要查询用户数据"
+**每个子需求需包含以下依赖信息：**
 
-  - from: "mall-app 接口"
-    to: "mall-agent 服务"
-    type: "hard"
-    reason: "客户端门面依赖应用服务"
+| 依赖项 | 说明 | 示例 |
+|--------|------|------|
+| **依赖服务** | 需要调用的其他服务 | mall-agent, mall-user |
+| **依赖数据库表** | 需要访问的数据库表 | aim_employee, aim_user |
+| **被谁依赖** | 哪些子需求依赖本需求 | REQ-001, REQ-002 |
 
-  - from: "Controller"
-    to: "Service"
-    type: "hard"
-    reason: "控制器依赖业务逻辑"
+**依赖类型说明：**
 
-  - from: "Service"
-    to: "Repository"
-    type: "hard"
-    reason: "业务逻辑依赖数据访问"
+- **Hard 依赖**：必须等待被依赖方完成后才能开发
+  - Controller → Service
+  - Service → Repository
+  - Feign Client → Provider Service
 
-  - from: "Feign app"
-    to: "Provider Service"
-    type: "soft"
-    reason: "需要服务提供方先定义接口"
-```
+- **Soft 依赖**：可以并行开发，但需要协调接口契约
+  - 门面服务 → 应用服务（接口定义优先）
 
 ---
 
@@ -218,11 +204,17 @@ dependencies:
 **decomposition.md 结构：**
 
 ```markdown
-# 需求拆分结果
+# 需求分解结果
 
 ## Program: P-YYYY-NNN-{feature-name}
 
-### 需求列表
+### 需求概述
+
+- **来源**: PRD 文档 / 一句话描述
+- **功能模块**: xxx
+- **涉及服务**: mall-admin, mall-app, mall-agent, mall-user
+
+### 子需求列表
 
 #### REQ-001: [mall-admin] 创建智能员工接口
 
@@ -230,10 +222,13 @@ dependencies:
 - **描述**: 管理后台创建智能员工
 - **代码位置**: `repos/mall-admin/src/main/java/com/aim/mall/admin/controller/AgentAdminController.java`
 - **接口路径**: `POST /admin/api/v1/ai-employee`
+- **依赖模块**:
+  - 依赖服务: mall-agent
+  - 依赖数据库表: aim_employee
 - **验收标准**:
-    - [ ] 接收创建智能员工请求参数
-    - [ ] 调用 mall-agent 服务创建智能员工
-    - [ ] 返回创建结果
+  - [ ] 接收创建智能员工请求参数
+  - [ ] 调用 mall-agent 服务创建智能员工
+  - [ ] 返回创建结果
 
 #### REQ-002: [mall-app] 获取智能员工列表接口
 
@@ -241,10 +236,13 @@ dependencies:
 - **描述**: APP 端获取智能员工列表
 - **代码位置**: `repos/mall-app/src/main/java/com/aim/mall/app/controller/AgentAppController.java`
 - **接口路径**: `GET /app/api/v1/ai-employee/list`
+- **依赖模块**:
+  - 依赖服务: mall-agent
+  - 依赖数据库表: aim_employee
 - **验收标准**:
-    - [ ] 支持分页查询
-    - [ ] 调用 mall-agent 服务获取数据
-    - [ ] 返回 VO 对象
+  - [ ] 支持分页查询
+  - [ ] 调用 mall-agent 服务获取数据
+  - [ ] 返回 VO 对象
 
 #### REQ-003: [mall-agent] 智能员工业务逻辑
 
@@ -254,11 +252,14 @@ dependencies:
 - **Inner 接口路径**:
   - `POST /inner/api/v1/ai-employee/create`
   - `GET /inner/api/v1/ai-employee/list`
+- **依赖模块**:
+  - 依赖服务: mall-user
+  - 依赖数据库表: aim_employee, aim_user
 - **验收标准**:
-    - [ ] 实现创建智能员工逻辑
-    - [ ] 实现查询智能员工逻辑
-    - [ ] 调用 mall-user 服务查询用户信息
-    - [ ] 返回 Response DTO 对象
+  - [ ] 实现创建智能员工逻辑
+  - [ ] 实现查询智能员工逻辑
+  - [ ] 调用 mall-user 服务查询用户信息
+  - [ ] 返回 Response DTO 对象
 
 #### REQ-004: [mall-user] 用户信息查询
 
@@ -266,20 +267,95 @@ dependencies:
 - **描述**: 提供用户信息查询接口供 mall-agent 调用
 - **代码位置**: `repos/mall-user/src/main/java/com/aim/mall/user/feign/UserFeignService.java`
 - **Inner 接口路径**: `GET /inner/api/v1/user/detail?userId={userId}`
+- **依赖模块**:
+  - 依赖服务: 无
+  - 依赖数据库表: aim_user
 - **验收标准**:
-    - [ ] 定义 Feign 接口（使用 Query 参数，禁止路径参数）
-    - [ ] 实现用户查询逻辑
-    - [ ] 返回 Response DTO 对象
+  - [ ] 定义 Feign 接口（使用 Query 参数，禁止路径参数）
+  - [ ] 实现用户查询逻辑
+  - [ ] 返回 Response DTO 对象
 
 #### REQ-005: [DB] 智能员工表设计
 
 - **来源**: PRD 第 2.1 节
 - **描述**: 设计智能员工数据表
 - **代码位置**: `repos/mall-agent/src/main/resources/db/V001__create_agent.sql`
+- **涉及表**: aim_employee
+- **依赖模块**:
+  - 被依赖: REQ-003, REQ-004
 - **验收标准**:
-    - [ ] 表结构设计
-    - [ ] 索引设计
-    - [ ] 字段注释
+  - [ ] 表结构设计
+  - [ ] 索引设计
+  - [ ] 字段注释
+
+### 数据库设计汇总
+
+#### 表清单
+
+| 序号 | 表名 | 所属服务 | 用途 | 关联子需求 |
+|------|------|----------|------|------------|
+| 1 | aim_employee | mall-agent | 智能员工表 | REQ-003, REQ-005 |
+| 2 | aim_user | mall-user | 用户表 | REQ-004, REQ-005 |
+
+#### 表结构详情
+
+**aim_employee**
+
+```sql
+CREATE TABLE aim_employee (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
+    name VARCHAR(100) NOT NULL COMMENT '员工名称',
+    -- 其他字段
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记'
+) COMMENT='智能员工表';
+```
+
+### 依赖关系图
+
+```mermaid
+graph TD
+    subgraph "门面层"
+        REQ001[REQ-001: mall-admin 接口]
+        REQ002[REQ-002: mall-app 接口]
+    end
+
+    subgraph "应用层"
+        REQ003[REQ-003: mall-agent 业务]
+    end
+
+    subgraph "支撑层"
+        REQ004[REQ-004: mall-user 服务]
+    end
+
+    subgraph "数据层"
+        REQ005[REQ-005: 数据库]
+    end
+
+    REQ001 --> REQ003
+    REQ002 --> REQ003
+    REQ003 --> REQ004
+    REQ003 --> REQ005
+    REQ004 --> REQ005
+```
+
+### 依赖矩阵
+
+| 子需求 | 依赖服务 | 依赖数据库表 | 被谁依赖 |
+|--------|----------|--------------|----------|
+| REQ-001 | mall-agent | aim_employee | - |
+| REQ-002 | mall-agent | aim_employee | - |
+| REQ-003 | mall-user | aim_employee, aim_user | REQ-001, REQ-002 |
+| REQ-004 | - | aim_user | REQ-003 |
+| REQ-005 | - | - | REQ-003, REQ-004 |
+
+### 开发顺序建议
+
+1. **第一阶段**: REQ-005（数据库表设计）
+2. **第二阶段**: REQ-004（mall-user 服务）
+3. **第三阶段**: REQ-003（mall-agent 业务）
+4. **第四阶段**: REQ-001, REQ-002（门面接口）
 ```
 
 ---
@@ -318,10 +394,11 @@ graph TD
 ## 检查清单
 
 - [ ] 所有 PRD 功能点都已覆盖
-- [ ] 每个需求都有明确的服务归属（mall-admin/mall-app/mall-chat/mall-agent/mall-user）
+- [ ] 每个子需求都有明确的服务归属（mall-admin/mall-app/mall-chat/mall-agent/mall-user）
 - [ ] 接口入口正确区分（管理端 vs 客户端）
 - [ ] Feign 调用关系已识别
-- [ ] 依赖关系已标注（hard/soft）
+- [ ] 每个子需求的依赖模块已标注（依赖服务、依赖数据库表）
+- [ ] 数据库表设计已汇总到文档末尾
 - [ ] 代码路径符合项目结构规范
 - [ ] 分层接口风格规范已明确（门面层 RESTful / 应用层简化）
 - [ ] 参数校验职责已明确（门面层负责）

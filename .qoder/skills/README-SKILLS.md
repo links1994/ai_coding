@@ -10,6 +10,7 @@
 
 | Skill     | 文件                         | 说明                        | 使用时机    |
 |-----------|----------------------------|---------------------------|---------|
+| 需求分解 | `prd-decomposition.md`     | 根据 PRD 进行需求拆解，生成子需求列表和依赖关系 | Phase 1 |
 | Java 代码生成 | `java-code-generation.md`  | 根据技术规格书生成 Java 微服务代码      | Phase 4 |
 | HTTP 测试生成 | `http-test-generation.md`  | 为 Controller 生成 HTTP 测试文件 | Phase 5 |
 | 代码质量分析    | `code-quality-analysis.md` | 对生成的代码进行质量分析和优化           | Phase 6 |
@@ -20,7 +21,6 @@
 |--------|------------------------|-------------------------------|---------|
 | 业务功能归档 | `feature-archiving.md` | 将已完成功能归档到 repowiki，支持下次迭代复用   | 功能完成后   |
 | 功能检索   | `feature-retrieval.md` | 查询 repowiki 中已归档的功能，快速找到可复用功能 | 新功能开发前  |
-| 依赖查询   | `dependency-query.md`  | 按需加载模块依赖和外部 jar 信息            | 需要依赖信息时 |
 | 离线文档查询 | `offline-doc-query.md` | 查询本地文档资源                      | 需要技术参考时 |
 
 ---
