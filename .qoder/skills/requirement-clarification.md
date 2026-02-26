@@ -2,9 +2,13 @@
 name: requirement-clarification
 description: 使用 ReAct 模式进行交互式需求澄清，逐个问题确认并实时更新结果
 tools: Read, Write, Grep, ask_user_question
+language: zh-CN
+output_language: 中文
 ---
 
 # 需求澄清 Skill
+
+> **语言约束**: 本 Skill 的所有输出必须使用中文，包括问题、选项、文档内容和状态报告。
 
 使用 ReAct (Reasoning + Acting) 设计模式，与用户进行交互式需求澄清。逐个问题确认，提供选项供用户选择，实时更新问题清单和确认结果。
 

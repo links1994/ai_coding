@@ -2,9 +2,13 @@
 name: tech-spec-generation
 description: 生成详细技术规格书，支持迭代修正和双向追溯，确保设计文档与需求文档同步
 tools: Read, Write, Grep, ask_user_question
+language: zh-CN
+output_language: 中文
 ---
 
 # 技术规格书生成 Skill
+
+> **语言约束**: 本 Skill 的所有输出必须使用中文，包括技术规格书、OpenAPI定义、验收清单和状态报告。
 
 基于需求分解和澄清结果，生成详细的技术规格书（design.md）。支持迭代修正：当设计不满足要求时，接受用户补充上下文或修改意见，并智能判断是否需要同步更新需求文档。
 
