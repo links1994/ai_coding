@@ -31,6 +31,34 @@ tools: Read, Write, Grep
 ## 输出
 
 - 需求分解文档 → `orchestrator/PROGRAMS/{program_id}/workspace/decomposition.md`
+- 更新 STATUS.yml → 标记为 completed，仅保留"需求拆分"阶段
+
+## Program 命名规范
+
+拆分类型 Program 命名：`{原始ID}-decomposition`
+
+示例：
+- 原始需求：P-2026-001-ai-agent-platform
+- 拆分 Program：P-2026-001-decomposition
+
+## 与 Implementation Program 的关系
+
+```
+P-2026-001-decomposition/          # 本 Skill 创建
+├── STATUS.yml (status: completed)  # 只含"需求拆分"阶段
+├── PROGRAM.md
+└── workspace/
+    └── decomposition.md            # 包含所有子需求
+
+# 用户后续手动创建（独立 Program）：
+P-2026-001-REQ-031/                 # 用户命令创建
+├── STATUS.yml (需求澄清/技术规格/代码生成...)
+├── PROGRAM.md
+└── workspace/
+    ├── questions.md
+    ├── answers.md
+    └── tech-spec.md
+```
 
 ---
 
@@ -251,5 +279,16 @@ graph TD
 状态：已完成
 报告：orchestrator/PROGRAMS/{program_id}/workspace/decomposition.md
 产出：1 个文件（需求分解文档）
-决策点：无
+
+Program 状态：
+- 名称: {program_id}-decomposition
+- 阶段: 需求拆分 completed
+- 状态: completed（本 Program 已结束）
+
+后续操作：
+为单个 REQ 创建新的 Implementation Program：
+  "创建 Program {program_id}-REQ-xxx 实现 [需求名称]"
+
+例如：
+  "创建 Program P-2026-001-REQ-031 实现智能员工应用服务"
 ```

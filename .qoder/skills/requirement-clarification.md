@@ -15,24 +15,38 @@ tools: Read, Write, Grep, ask_user_question
 ## 触发条件
 
 - 用户指令："澄清 REQ-xxx" 或 "确认需求 REQ-xxx"
-- 分解文档 `decomposition.md` 已生成
-- 主 Agent 在 Phase 2 调用
+- 当前 Program 为 Implementation 类型（非 decomposition 类型）
+- 需要从 decomposition Program 引用分解文档
+
+## Program 类型
+
+本 Skill 适用于 **Implementation Program**（实现类型），而非 Decomposition Program。
+
+Implementation Program 命名规范：`{父ID}-REQ-xxx`
+
+示例：
+- Decomposition Program: `P-2026-001-decomposition`
+- Implementation Program: `P-2026-001-REQ-031`（本 Skill 在此类 Program 中运行）
 
 ---
 
 ## 输入
 
-- 目标需求 ID（如 REQ-001）
-- `orchestrator/PROGRAMS/{program_id}/workspace/decomposition.md` — 需求分解文档
+- 目标需求 ID（如 REQ-031）
+- `orchestrator/PROGRAMS/{decomposition_program_id}/workspace/decomposition.md` — 需求分解文档
+  - 从当前 Program ID 推导 decomposition Program ID
+  - 示例：当前 `P-2026-001-REQ-031` → 读取 `P-2026-001-decomposition/workspace/decomposition.md`
 - `.qoder/rules/02-requirement-clarification.md` — 需求澄清规范
+- 当前 Program 的 STATUS.yml — 更新阶段状态
 
 ---
 
 ## 输出
 
-- 问题清单 → `orchestrator/PROGRAMS/{program_id}/workspace/questions/{req_id}.md`
-- 确认结果 → `orchestrator/PROGRAMS/{program_id}/workspace/answers/{req_id}.md`
-- 技术决策 → `orchestrator/PROGRAMS/{program_id}/workspace/decisions/{req_id}.md`
+- 问题清单 → `orchestrator/PROGRAMS/{current_program_id}/workspace/questions.md`
+- 确认结果 → `orchestrator/PROGRAMS/{current_program_id}/workspace/answers.md`
+- 技术决策 → `orchestrator/PROGRAMS/{current_program_id}/workspace/decisions.md`
+- 更新 STATUS.yml → 阶段从"需求澄清"更新为"技术规格"
 
 ---
 
@@ -65,9 +79,10 @@ tools: Read, Write, Grep, ask_user_question
    - 读取澄清规范
 
 2. **检查现有状态**
-   - 检查是否已有 `workspace/questions/{req_id}.md`
-   - 检查是否已有 `workspace/answers/{req_id}.md`
+   - 检查是否已有 `workspace/questions.md`
+   - 检查是否已有 `workspace/answers.md`
    - 确定当前澄清进度
+   - 检查当前 Program STATUS.yml 确认处于"需求澄清"阶段
 
 3. **初始化内存状态**
    ```json
@@ -157,7 +172,7 @@ D. 其他（请描述具体需求）
 
 #### 2.4 Update - 实时更新文档
 
-**立即更新 `workspace/questions/{req_id}.md`：**
+**立即更新 `workspace/questions.md`：**
 ```markdown
 ## 问题列表
 
@@ -169,7 +184,7 @@ D. 其他（请描述具体需求）
 | 2 | 创建时绑定技能 | 影响接口参数 | 可选技能列表 | 🔄 进行中 | - |
 ```
 
-**立即更新 `workspace/answers/{req_id}.md`：**
+**立即更新 `workspace/answers.md`：**
 ```markdown
 ## 问题确认结果
 
@@ -185,7 +200,17 @@ D. 其他（请描述具体需求）
 
 ### Step 3: 生成技术决策记录
 
-所有问题澄清完成后，生成 `workspace/decisions/{req_id}.md`：
+所有问题澄清完成后，生成 `workspace/decisions.md`，并更新 STATUS.yml：
+
+```yaml
+# STATUS.yml 更新为
+current_phase: 技术规格
+phases:
+  - name: 需求澄清
+    status: completed
+  - name: 技术规格
+    status: pending
+```
 
 ```markdown
 # 技术决策记录 (ADR)
@@ -310,10 +335,15 @@ Agent: ✅ REQ-001 所有问题已澄清！
 ```
 状态：已完成 / 进行中 / 需要继续澄清
 报告：
-  - workspace/questions/REQ-xxx.md
-  - workspace/answers/REQ-xxx.md
-  - workspace/decisions/REQ-xxx.md
+  - workspace/questions.md
+  - workspace/answers.md
+  - workspace/decisions.md
 进度：X/Y 个问题已确认
+
+Program 状态更新：
+  - current_phase: 技术规格
+  - phases.需求澄清.status: completed
+
 决策点：
   - 高优先级问题已全部确认：是/否
   - 是否可以进入技术规格书阶段：是/否

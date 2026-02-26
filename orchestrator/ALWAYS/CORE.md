@@ -18,60 +18,43 @@ PRD → Phase 1: 需求拆分 → Phase 2: 需求澄清 → Phase 3: 技术规�
 ### Phase 1: 需求拆分与依赖分析
 
 - **输入**: PRD 文档
-- **输出**: `artifacts/spec/{program_id}/requirements/`
-  - `decomposition.md` — 需求拆分结果
-  - `dependencies.md` — 依赖关系图
-  - `assignment.md` — 服务归属判断
-- **规则**: 参考 `.qoder/rules/01-prd-decomposition.md`
+- **Skill**: `.qoder/skills/prd-decomposition.md`
+- **规则**: `.qoder/rules/01-prd-decomposition.md`
+- **说明**: 生成 decomposition.md 后，本 Program 即结束。后续为每个 REQ 创建独立的 Implementation Program。
 
 ### Phase 2: 需求澄清与确认
 
-- **输入**: 需求拆分结果
-- **输出**: `artifacts/spec/{program_id}/clarification/`
-  - `questions.md` — 澄清问题列表
-  - `answers.md` — 确认后的答案
-  - `decisions.md` — 技术决策记录
-- **规则**: 参考 `.qoder/rules/02-requirement-clarification.md`
-- **注意**: 此阶段需要用户参与确认
+- **输入**: 需求拆分结果（从 decomposition Program 读取）
+- **Skill**: `.qoder/skills/requirement-clarification.md`
+- **规则**: `.qoder/rules/02-requirement-clarification.md`
+- **注意**: 此阶段在 Implementation Program 中执行，需要用户参与确认
 
 ### Phase 3: 技术规格书生成
 
 - **输入**: 确认后的需求 + 技术决策
-- **输出**: `artifacts/spec/{program_id}/`
-  - `design.md` — 主技术规格书
-  - `api/openapi.yaml` — OpenAPI 定义
-  - `diagrams/` — 架构图、ER图
-  - `checklist.md` — 验收标准
-- **规则**: 参考 `.qoder/rules/03-tech-spec-generation.md`
-- **规范**: 参考 `.qoder/rules/05-architecture-standards.md`
+- **Skill**: `.qoder/skills/tech-spec-generation.md`
+- **规则**: `.qoder/rules/03-tech-spec-generation.md`
+- **规范**: `.qoder/rules/05-architecture-standards.md`
 
 ### Phase 4: 代码生成
 
 - **输入**: 技术规格书
-- **输出**: 各服务 Java 代码
-- **执行**: 调用 `.qoder/skills/java-code-generation.md` Skill
-- **规范**: 参考 `.qoder/rules/04-coding-standards.md`
-- **产出**:
-  - `repos/*/src/main/java/com/aim/mall/*/*/*.java`
-  - `workspace/code-generation-report.md`
+- **Skill**: `.qoder/skills/java-code-generation.md`
+- **规范**: `.qoder/rules/04-coding-standards.md`
 
 ### Phase 5: HTTP 测试生成
 
 - **输入**: 生成的 Controller 代码
-- **输出**: HTTP 测试文件
-- **执行**: 调用 `.qoder/skills/http-test-generation.md` Skill
-- **产出**:
-  - `repos/*/src/main/java/com/aim/mall/*/*/controller/http/*.http`
-  - `workspace/http-test-report.md`
+- **Skill**: `.qoder/skills/http-test-generation.md`
 
 ### Phase 6: 代码质量优化
 
 - **输入**: 生成的代码
-- **输出**: 质量分析报告和优化建议
-- **执行**: 调用 `.qoder/skills/code-quality-analysis.md` Skill
-- **产出**:
-  - `workspace/code-quality-analysis.yaml`
-  - `workspace/code-quality-report.md`
+- **Skill**: `.qoder/skills/code-quality-analysis.md`
+
+---
+
+**注意**: 各阶段的具体输出文件路径和格式，以对应的 Skill 文件定义为准。
 
 ---
 
@@ -96,11 +79,19 @@ PRD → Phase 1: 需求拆分 → Phase 2: 需求澄清 → Phase 3: 技术规�
 
 ### STATUS.yml 同步规范
 
-使用 `add_tasks` / `update_tasks` 工具跟踪任务时，**必须同步更新 STATUS.yml 文件**，确保文件状态与实际操作一致：
+**核心原则：内存状态与文件状态必须保持一致**
+
+无论何时更新 Program 的执行状态（阶段变更、任务进度、完成标记等），**必须同步更新 STATUS.yml 文件**：
 
 ```
-每次调用 update_tasks 后 → 立即更新 STATUS.yml 中的对应任务状态
+内存状态变更 → 立即同步到 STATUS.yml
 ```
+
+这包括：
+- 阶段状态变更（如：需求澄清 → 技术规格）
+- 任务进度更新
+- 产出物状态变更
+- Program 完成标记
 
 **状态映射关系**：
 
@@ -214,6 +205,51 @@ HANDOFF 写入的是结构化的交接文档，信息密度远高于 compress �
 2. 执行并记录进度
 3. 遇到决策点询问用户
 4. 完成后更新状态
+
+---
+
+## Program 执行判断
+
+**每次执行任何操作前，必须先判断当前 Program 状态**：
+
+### 判断流程
+
+```
+1. 读取 STATUS.yml
+   ↓
+2. 检查 current_phase 和 status
+   ↓
+3. 判断是否可以执行当前操作
+   ↓
+4. 执行后更新 STATUS.yml
+```
+
+### Program 类型判断
+
+| Program 类型 | 特征 | 可执行操作 |
+|-------------|------|-----------|
+| **decomposition** | 仅含"需求拆分"阶段，status: completed | 只读，不再执行任何 Skill |
+| **implementation** | 含多个阶段（需求澄清/技术规格/代码生成...） | 根据 current_phase 执行对应 Skill |
+
+### 阶段执行规则
+
+```yaml
+# 当前阶段判断示例
+current_phase: 需求澄清
+→ 可执行: requirement-clarification Skill
+→ 不可执行: tech-spec-generation, code-generation 等
+
+current_phase: 技术规格  
+→ 可执行: tech-spec-generation Skill
+→ 需先完成: 需求澄清（answers.md 已生成）
+```
+
+### 执行前检查清单
+
+- [ ] 当前 Program 类型是否支持该操作？
+- [ ] 当前阶段是否允许执行该 Skill？
+- [ ] 前置条件是否满足（前置阶段已完成、必要文件已生成）？
+- [ ] 执行后是否需要更新 STATUS.yml？
 
 ---
 

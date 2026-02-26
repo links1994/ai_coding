@@ -14,27 +14,37 @@ tools: Read, Write, Grep, ask_user_question
 
 ## 触发条件
 
-- 用户指令："生成技术规格书" 或 "设计 REQ-xxx"
-- 需求澄清已完成（answers/{req_id}.md 已生成）
-- 主 Agent 在 Phase 3 调用
+- 用户指令："生成技术规格书" 或 "设计 SPEC"
+- 当前 Program 为 Implementation 类型
+- 需求澄清已完成（workspace/answers.md 已生成）
+
+## Program 类型
+
+本 Skill 适用于 **Implementation Program**（实现类型）。
+
+示例：在 `P-2026-001-REQ-031` Program 中运行本 Skill
 
 ---
 
 ## 输入
 
-- `orchestrator/PROGRAMS/{program_id}/workspace/decomposition.md` — 需求分解文档
-- `orchestrator/PROGRAMS/{program_id}/workspace/answers/{req_id}.md` — 需求澄清结果
-- `orchestrator/PROGRAMS/{program_id}/workspace/decisions/{req_id}.md` — 技术决策记录
+- `orchestrator/PROGRAMS/{decomposition_program_id}/workspace/decomposition.md` — 需求分解文档
+  - 从当前 Program ID 推导：如 `P-2026-001-REQ-031` → `P-2026-001-decomposition`
+  - 提取当前 REQ 的定义
+- `orchestrator/PROGRAMS/{current_program_id}/workspace/answers.md` — 需求澄清结果
+- `orchestrator/PROGRAMS/{current_program_id}/workspace/decisions.md` — 技术决策记录
 - `.qoder/rules/03-tech-spec-generation.md` — 技术规格规范
 - `.qoder/rules/05-architecture-standards.md` — 架构规范
+- 当前 Program 的 STATUS.yml — 更新阶段状态
 
 ---
 
 ## 输出
 
-- 技术规格书 → `orchestrator/PROGRAMS/{program_id}/workspace/design.md`
-- OpenAPI 定义 → `orchestrator/PROGRAMS/{program_id}/workspace/api/openapi.yaml`
-- 验收清单 → `orchestrator/PROGRAMS/{program_id}/workspace/checklist.md`
+- 技术规格书 → `orchestrator/PROGRAMS/{current_program_id}/workspace/tech-spec.md`
+- OpenAPI 定义 → `orchestrator/PROGRAMS/{current_program_id}/workspace/openapi.yaml`
+- 验收清单 → `orchestrator/PROGRAMS/{current_program_id}/workspace/checklist.md`
+- 更新 STATUS.yml → 阶段从"技术规格"更新为"代码生成"
 
 ---
 
@@ -42,10 +52,17 @@ tools: Read, Write, Grep, ask_user_question
 
 ### Step 1: 读取输入文档
 
-1. 读取需求分解文档（decomposition.md）
-2. 读取所有需求澄清结果（answers/*.md）
-3. 读取技术决策记录（decisions/*.md）
-4. 读取架构规范和编码规范
+1. **推导 decomposition Program ID**
+   - 当前 Program: `P-2026-001-REQ-031`
+   - Decomposition Program: `P-2026-001-decomposition`
+
+2. 读取需求分解文档（decomposition.md）
+   - 只提取当前 REQ 相关的部分
+
+3. 读取当前 Program 的需求澄清结果（workspace/answers.md）
+4. 读取当前 Program 的技术决策记录（workspace/decisions.md）
+5. 读取架构规范和编码规范
+6. 检查 STATUS.yml 确认处于"技术规格"阶段
 
 ### Step 2: 分析依赖与上下文
 
@@ -73,7 +90,9 @@ tools: Read, Write, Grep, ask_user_question
 
 ### Step 3: 生成技术规格书（初稿）
 
-按以下结构生成 `orchestrator/PROGRAMS/{program_id}/workspace/design.md`：
+按以下结构生成 `orchestrator/PROGRAMS/{current_program_id}/workspace/tech-spec.md`：
+
+> 注意：针对单个 REQ 生成精简版技术规格，而非完整系统设计
 
 ```markdown
 # 技术规格书
@@ -123,7 +142,12 @@ tools: Read, Write, Grep, ask_user_question
 **呈现技术规格书给用户：**
 
 ```
-技术规格书初稿已生成：orchestrator/PROGRAMS/{program_id}/workspace/design.md
+技术规格书已生成：orchestrator/PROGRAMS/{current_program_id}/workspace/tech-spec.md
+
+本规格书针对单个 REQ 生成，包含该需求所需的：
+- 数据模型设计（相关表）
+- API 接口定义（该 REQ 涉及的接口）
+- 业务规则实现
 
 主要内容预览：
 ├── 数据模型: X 张表（Y 张新增，Z 张修改）
@@ -405,14 +429,20 @@ stateDiagram
 
 ```
 状态：已完成 / 需要迭代
-报告：orchestrator/PROGRAMS/{program_id}/workspace/design.md
+报告：orchestrator/PROGRAMS/{current_program_id}/workspace/tech-spec.md
 关联文档：
-  - workspace/api/openapi.yaml
+  - workspace/openapi.yaml
   - workspace/checklist.md
+
+Program 状态更新：
+  - current_phase: 代码生成
+  - phases.技术规格.status: completed
+
 产出变更：
   - 需求文档更新: 是/否
   - 更新文件列表: [xxx.md, yyy.md]
 决策点：
   - 是否需要补充上下文: 是/否
   - 是否需要调整设计: 是/否
+  - 是否进入代码生成阶段: 是/否
 ```
