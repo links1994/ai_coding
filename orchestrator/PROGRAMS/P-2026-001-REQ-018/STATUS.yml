@@ -15,7 +15,8 @@ phases:
     started_at: 2026-02-26
     completed_at: 2026-02-26
   - name: 开发实现
-    status: in_progress
+    status: completed
+    completed_at: 2026-02-26
   - name: 测试验证
     status: pending
 
@@ -41,4 +42,6 @@ artifacts:
 
 notes: |
   从 decomposition.md 的 REQ-018 创建。
-  当前处于需求澄清阶段，需要确认岗位管理的业务规则。
+  代码生成已完成，包含以下文件：
+  - mall-agent: JobTypeDO, JobTypeMapper, JobTypeService, JobTypeInnerController, DTOs
+  - mall-admin: JobTypeAdminController, JobTypeFeignClient, DTOs
