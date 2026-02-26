@@ -23,16 +23,16 @@ tools: Read, Write, Grep, ask_user_question
 ## 输入
 
 - 目标需求 ID（如 REQ-001）
-- `artifacts/spec/{program_id}/requirements/decomposition.md` — 需求分解文档
+- `orchestrator/PROGRAMS/{program_id}/workspace/decomposition.md` — 需求分解文档
 - `.qoder/rules/02-requirement-clarification.md` — 需求澄清规范
 
 ---
 
 ## 输出
 
-- 问题清单 → `artifacts/spec/{program_id}/requirements/questions/{req_id}.md`
-- 确认结果 → `artifacts/spec/{program_id}/requirements/answers/{req_id}.md`
-- 技术决策 → `artifacts/spec/{program_id}/requirements/decisions/{req_id}.md`
+- 问题清单 → `orchestrator/PROGRAMS/{program_id}/workspace/questions/{req_id}.md`
+- 确认结果 → `orchestrator/PROGRAMS/{program_id}/workspace/answers/{req_id}.md`
+- 技术决策 → `orchestrator/PROGRAMS/{program_id}/workspace/decisions/{req_id}.md`
 
 ---
 
@@ -65,8 +65,8 @@ tools: Read, Write, Grep, ask_user_question
    - 读取澄清规范
 
 2. **检查现有状态**
-   - 检查是否已有 `questions/{req_id}.md`
-   - 检查是否已有 `answers/{req_id}.md`
+   - 检查是否已有 `workspace/questions/{req_id}.md`
+   - 检查是否已有 `workspace/answers/{req_id}.md`
    - 确定当前澄清进度
 
 3. **初始化内存状态**
@@ -157,7 +157,7 @@ D. 其他（请描述具体需求）
 
 #### 2.4 Update - 实时更新文档
 
-**立即更新 `questions/{req_id}.md`：**
+**立即更新 `workspace/questions/{req_id}.md`：**
 ```markdown
 ## 问题列表
 
@@ -169,7 +169,7 @@ D. 其他（请描述具体需求）
 | 2 | 创建时绑定技能 | 影响接口参数 | 可选技能列表 | 🔄 进行中 | - |
 ```
 
-**立即更新 `answers/{req_id}.md`：**
+**立即更新 `workspace/answers/{req_id}.md`：**
 ```markdown
 ## 问题确认结果
 
@@ -185,7 +185,7 @@ D. 其他（请描述具体需求）
 
 ### Step 3: 生成技术决策记录
 
-所有问题澄清完成后，生成 `decisions/{req_id}.md`：
+所有问题澄清完成后，生成 `workspace/decisions/{req_id}.md`：
 
 ```markdown
 # 技术决策记录 (ADR)
@@ -264,9 +264,9 @@ Agent: ✅ 已记录：必须绑定至少一个技能
 Agent: ✅ REQ-001 所有问题已澄清！
        
        已生成文档：
-       - questions/REQ-001.md
-       - answers/REQ-001.md
-       - decisions/REQ-001.md
+       - workspace/questions/REQ-001.md
+       - workspace/answers/REQ-001.md
+       - workspace/decisions/REQ-001.md
        
        可以进入技术规格书生成阶段
 ```
@@ -310,9 +310,9 @@ Agent: ✅ REQ-001 所有问题已澄清！
 ```
 状态：已完成 / 进行中 / 需要继续澄清
 报告：
-  - questions/REQ-xxx.md
-  - answers/REQ-xxx.md
-  - decisions/REQ-xxx.md
+  - workspace/questions/REQ-xxx.md
+  - workspace/answers/REQ-xxx.md
+  - workspace/decisions/REQ-xxx.md
 进度：X/Y 个问题已确认
 决策点：
   - 高优先级问题已全部确认：是/否

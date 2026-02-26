@@ -30,7 +30,7 @@ tools: Read, Write, Grep
 
 ## 输出
 
-- 需求分解文档 → `artifacts/spec/{program_id}/requirements/decomposition.md`
+- 需求分解文档 → `orchestrator/PROGRAMS/{program_id}/workspace/decomposition.md`
 
 ---
 
@@ -83,7 +83,7 @@ tools: Read, Write, Grep
 
 ### Step 5: 生成需求分解文档
 
-生成 `artifacts/spec/{program_id}/requirements/decomposition.md`：
+生成 `orchestrator/PROGRAMS/{program_id}/workspace/decomposition.md`：
 
 ```markdown
 # 需求分解结果
@@ -249,7 +249,7 @@ graph TD
 
 ```
 状态：已完成
-报告：artifacts/spec/{program_id}/requirements/decomposition.md
+报告：orchestrator/PROGRAMS/{program_id}/workspace/decomposition.md
 产出：1 个文件（需求分解文档）
 决策点：无
 ```

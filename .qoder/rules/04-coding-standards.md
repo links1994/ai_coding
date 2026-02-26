@@ -223,23 +223,24 @@ public class AgentController {
 | `RemoteApiCallException` | 远程服务调用失败 | Feign 调用超时、返回错误 |
 | `BusinessException` | 业务规则违反 | 用户不存在、余额不足 |
 
-### 4.2 异常处理简化
+### 4.2 异常处理规范
 
-只需捕获 `Exception` 一层：
+由于有全局异常捕获（[GlobalExceptionHandler](file://d:/workspace/new_code/ai-coding/ai_coding/repos/mall-agent/src/main/java/com/aim/mall/agent/config/GlobalExceptionHandler.java)），Controller 层**不捕获任何异常**，直接抛出由全局处理器统一处理：
 
 ```java
 @PostMapping("/create")
 public CommonResult<Long> createAgent(
         @RequestBody @Valid AgentCreateRequest request) {
-    try {
-        Long agentId = agentService.createAgent(request);
-        return CommonResult.success(agentId);
-    } catch (Exception e) {
-        log.error("创建智能员工失败", e);
-        return CommonResult.failed("SYSTEM_ERROR", "创建失败");
-    }
+    Long agentId = agentService.createAgent(request);
+    return CommonResult.success(agentId);
 }
 ```
+
+**说明**:
+- 参数校验异常（`MethodArgumentValidationException`）→ 自动返回 400 错误
+- 业务异常（`BusinessException`）→ 自动返回业务错误码
+- 远程调用异常（`RemoteApiCallException`）→ 自动返回服务错误
+- 其他未捕获异常 → 自动返回 500 系统错误
 
 ### 4.3 自定义异常
 

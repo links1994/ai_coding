@@ -1,0 +1,42 @@
+program: P-2026-001-ai-agent-platform
+name: AI智能体代理平台
+
+current_phase: 需求拆分
+current_task: 已完成，等待技术规格生成
+
+phases:
+  - name: 需求拆分
+    status: completed
+    started_at: 2026-02-26
+    completed_at: 2026-02-26
+  
+  - name: 技术规格
+    status: pending
+  
+  - name: 数据库设计
+    status: pending
+  
+  - name: 接口开发
+    status: pending
+  
+  - name: 业务逻辑开发
+    status: pending
+  
+  - name: 联调测试
+    status: pending
+
+artifacts:
+  - path: workspace/decomposition.md
+    status: completed
+    desc: 需求拆分文档
+  
+  - path: workspace/tech-spec.md
+    status: pending
+    desc: 技术规格书
+  
+  - path: workspace/answers.md
+    status: pending
+    desc: 问题澄清记录
+
+notes: |
+  根据PRD和线框图进行需求拆分，识别所有子需求、服务归属和依赖关系。

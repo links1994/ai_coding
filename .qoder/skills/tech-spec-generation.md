@@ -22,9 +22,9 @@ tools: Read, Write, Grep, ask_user_question
 
 ## 输入
 
-- `artifacts/spec/{program_id}/requirements/decomposition.md` — 需求分解文档
-- `artifacts/spec/{program_id}/requirements/answers/{req_id}.md` — 需求澄清结果
-- `artifacts/spec/{program_id}/requirements/decisions/{req_id}.md` — 技术决策记录
+- `orchestrator/PROGRAMS/{program_id}/workspace/decomposition.md` — 需求分解文档
+- `orchestrator/PROGRAMS/{program_id}/workspace/answers/{req_id}.md` — 需求澄清结果
+- `orchestrator/PROGRAMS/{program_id}/workspace/decisions/{req_id}.md` — 技术决策记录
 - `.qoder/rules/03-tech-spec-generation.md` — 技术规格规范
 - `.qoder/rules/05-architecture-standards.md` — 架构规范
 
@@ -32,9 +32,9 @@ tools: Read, Write, Grep, ask_user_question
 
 ## 输出
 
-- 技术规格书 → `artifacts/spec/{program_id}/design.md`
-- OpenAPI 定义 → `artifacts/spec/{program_id}/api/openapi.yaml`
-- 验收清单 → `artifacts/spec/{program_id}/checklist.md`
+- 技术规格书 → `orchestrator/PROGRAMS/{program_id}/workspace/design.md`
+- OpenAPI 定义 → `orchestrator/PROGRAMS/{program_id}/workspace/api/openapi.yaml`
+- 验收清单 → `orchestrator/PROGRAMS/{program_id}/workspace/checklist.md`
 
 ---
 
@@ -73,7 +73,7 @@ tools: Read, Write, Grep, ask_user_question
 
 ### Step 3: 生成技术规格书（初稿）
 
-按以下结构生成 `design.md`：
+按以下结构生成 `orchestrator/PROGRAMS/{program_id}/workspace/design.md`：
 
 ```markdown
 # 技术规格书
@@ -123,7 +123,7 @@ tools: Read, Write, Grep, ask_user_question
 **呈现技术规格书给用户：**
 
 ```
-技术规格书初稿已生成：artifacts/spec/{program_id}/design.md
+技术规格书初稿已生成：orchestrator/PROGRAMS/{program_id}/workspace/design.md
 
 主要内容预览：
 ├── 数据模型: X 张表（Y 张新增，Z 张修改）
@@ -176,9 +176,9 @@ Agent:
    - 业务规则: 是（澄清文档中的技能绑定规则）
    
    【需要同步更新】
-   - decomposition.md: 更新 REQ-005 表设计
-   - answers/REQ-001.md: 更新技能绑定确认结果
-   - decisions/REQ-001.md: 新增技能关系决策
+   - workspace/decomposition.md: 更新 REQ-005 表设计
+   - workspace/answers/REQ-001.md: 更新技能绑定确认结果
+   - workspace/decisions/REQ-001.md: 新增技能关系决策
 
 3. 询问用户确认：
    "此设计变更涉及需求确认结果的调整，是否同步更新澄清文档？"
@@ -218,11 +218,11 @@ Agent:
 
 技术规格确认后，生成：
 
-1. **OpenAPI 定义** (`api/openapi.yaml`)
+1. **OpenAPI 定义** (`workspace/api/openapi.yaml`)
    - 从 design.md 的接口定义提取
    - 包含所有门面服务和内部服务的接口
 
-2. **验收清单** (`checklist.md`)
+2. **验收清单** (`workspace/checklist.md`)
    - 按子需求组织验收项
    - 关联到 design.md 的具体章节
 
@@ -405,10 +405,10 @@ stateDiagram
 
 ```
 状态：已完成 / 需要迭代
-报告：artifacts/spec/{program_id}/design.md
+报告：orchestrator/PROGRAMS/{program_id}/workspace/design.md
 关联文档：
-  - api/openapi.yaml
-  - checklist.md
+  - workspace/api/openapi.yaml
+  - workspace/checklist.md
 产出变更：
   - 需求文档更新: 是/否
   - 更新文件列表: [xxx.md, yyy.md]
