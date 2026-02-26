@@ -1,0 +1,153 @@
+# 本地文档索引
+# 此文件用于提高文档查询效率，由 offline-doc-query Skill 使用
+
+# ==================== 框架文档 ====================
+frameworks:
+  - id: mybatis-plus-guide
+    name: MyBatis-Plus 指南
+    path: frameworks/mybatis-plus/guide.md
+    type: framework
+    tags: [orm, mybatis, database, 分页, 查询]
+    sections:
+      - id: pagination
+        title: 分页查询
+        keywords: [page, pagination, 分页, PageHelper]
+      - id: query-wrapper
+        title: 条件构造器
+        keywords: [query, wrapper, 查询, QueryWrapper]
+      - id: code-generator
+        title: 代码生成器
+        keywords: [generator, 代码生成, 自动生成]
+
+  - id: spring-boot-reference
+    name: Spring Boot 参考文档
+    path: frameworks/spring-boot/reference.md
+    type: framework
+    tags: [spring, boot, framework, 自动配置]
+    sections:
+      - id: auto-configuration
+        title: 自动配置
+        keywords: [auto, configuration, 自动配置]
+      - id: web
+        title: Web 开发
+        keywords: [web, mvc, controller, rest]
+
+  - id: rocketmq-docs
+    name: RocketMQ 文档
+    path: frameworks/rocketmq/guide.md
+    type: framework
+    tags: [mq, message, 消息队列, rocketmq]
+    sections:
+      - id: producer
+        title: 生产者
+        keywords: [producer, 生产者, send]
+      - id: consumer
+        title: 消费者
+        keywords: [consumer, 消费者, subscribe]
+
+# ==================== API 文档 ====================
+apis:
+  internal:
+    - id: user-service-api
+      name: 用户服务 API
+      path: apis/internal/user-service-api.md
+      type: api
+      tags: [user, 用户, service, feign, mall-user]
+      
+    - id: agent-service-api
+      name: 智能员工服务 API
+      path: apis/internal/agent-service-api.md
+      type: api
+      tags: [agent, 智能员工, ai, mall-agent]
+      
+    - id: chat-service-api
+      name: 对话服务 API
+      path: apis/internal/chat-service-api.md
+      type: api
+      tags: [chat, 对话, sse, mall-chat]
+
+  aliyun:
+    - id: aliyun-nlp-api
+      name: 阿里云 NLP API
+      path: apis/aliyun/nlp-api.md
+      type: api
+      tags: [nlp, 自然语言, aliyun, 阿里云]
+      
+    - id: aliyun-oss-api
+      name: 阿里云 OSS API
+      path: apis/aliyun/oss-api.md
+      type: api
+      tags: [oss, 对象存储, aliyun, 阿里云]
+
+# ==================== 技术规范 ====================
+specs:
+  - id: java-coding-standard
+    name: Java 编码规范
+    path: specs/java-coding-standard.md
+    type: spec
+    tags: [java, coding, 编码规范, 规范]
+    
+  - id: restful-api-design
+    name: RESTful API 设计规范
+    path: specs/restful-api-design.md
+    type: spec
+    tags: [restful, api, 接口设计, 规范]
+    
+  - id: microservice-patterns
+    name: 微服务设计模式
+    path: specs/microservice-patterns.md
+    type: spec
+    tags: [microservice, 微服务, 设计模式, pattern]
+    
+  - id: ddd-practice-guide
+    name: DDD 实践指南
+    path: specs/ddd-practice-guide.md
+    type: spec
+    tags: [ddd, 领域驱动设计, 架构, domain]
+
+# ==================== 操作指南 ====================
+guides:
+  deployment:
+    - id: docker-deploy
+      name: Docker 部署指南
+      path: guides/deployment/docker-deploy.md
+      type: guide
+      tags: [docker, 部署, container, 容器]
+      
+    - id: k8s-deploy
+      name: Kubernetes 部署指南
+      path: guides/deployment/k8s-deploy.md
+      type: guide
+      tags: [k8s, kubernetes, 部署, 容器编排]
+
+  operations:
+    - id: monitoring
+      name: 监控配置指南
+      path: guides/operations/monitoring.md
+      type: guide
+      tags: [monitoring, 监控, prometheus, grafana]
+      
+    - id: backup-restore
+      name: 备份恢复指南
+      path: guides/operations/backup-restore.md
+      type: guide
+      tags: [backup, restore, 备份, 恢复]
+
+  troubleshooting:
+    - id: common-issues
+      name: 常见问题排查
+      path: guides/troubleshooting/common-issues.md
+      type: guide
+      tags: [troubleshooting, 故障排查, 问题, issue]
+      
+    - id: performance-tuning
+      name: 性能调优指南
+      path: guides/troubleshooting/performance-tuning.md
+      type: guide
+      tags: [performance, 性能, tuning, 调优]
+
+# ==================== 元数据 ====================
+metadata:
+  version: "1.0"
+  last_updated: "2026-02-26"
+  total_documents: 15
