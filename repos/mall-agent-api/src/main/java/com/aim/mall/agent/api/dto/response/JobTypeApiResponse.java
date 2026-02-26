@@ -1,4 +1,4 @@
-package com.aim.mall.admin.api.dto.response;
+package com.aim.mall.agent.api.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -7,13 +7,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 岗位类型响应（管理端）
+ * 岗位类型响应（远程接口返回）
  *
  * @author Qoder
  * @since 2026/2/26
  */
 @Data
-public class JobTypeResponse implements Serializable {
+public class JobTypeApiResponse implements Serializable {
 
     private static final long serialVersionUID = -1L;
 

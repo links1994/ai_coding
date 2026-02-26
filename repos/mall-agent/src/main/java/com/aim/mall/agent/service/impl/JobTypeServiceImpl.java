@@ -1,9 +1,10 @@
 package com.aim.mall.agent.service.impl;
 
-import com.aim.mall.agent.domain.dto.JobTypeCreateDTO;
-import com.aim.mall.agent.domain.dto.JobTypeListQuery;
-import com.aim.mall.agent.domain.dto.JobTypeUpdateDTO;
-import com.aim.mall.agent.domain.entity.JobTypeDO;
+import com.aim.mall.agent.api.dto.request.JobTypeCreateApiRequest;
+import com.aim.mall.agent.api.dto.request.JobTypeListApiRequest;
+import com.aim.mall.agent.api.dto.request.JobTypeUpdateApiRequest;
+import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
+import com.aim.mall.agent.domain.entity.AimJobTypeDO;
 import com.aim.mall.agent.domain.enums.ErrorCodeEnum;
 import com.aim.mall.agent.domain.exception.BusinessException;
 import com.aim.mall.agent.mapper.JobTypeMapper;
@@ -31,27 +32,53 @@ public class JobTypeServiceImpl implements JobTypeService {
     private final JobTypeMapper jobTypeMapper;
 
     @Override
-    public CommonResult<CommonResult.PageData<JobTypeDO>> list(JobTypeListQuery query) {
-        log.info("查询岗位类型列表, keyword={}, pageNum={}, pageSize={}", 
-                query.getKeyword(), query.getPageNum(), query.getPageSize());
+    public CommonResult<CommonResult.PageData<JobTypeApiResponse>> pageJobType(JobTypeListApiRequest request) {
+        log.debug("查询岗位类型列表开始, keyword={}, pageNum={}, pageSize={}",
+                request.getKeyword(), request.getPageNum(), request.getPageSize());
 
         // 计算分页参数
-        int offset = (query.getPageNum() - 1) * query.getPageSize();
-        int limit = query.getPageSize();
+        int offset = (request.getPageNum() - 1) * request.getPageSize();
+        int limit = request.getPageSize();
 
-        // 查询数据（单表查询，直接返回DO）
-        List<JobTypeDO> records = jobTypeMapper.selectPageByKeyword(query.getKeyword(), offset, limit);
-        Long total = jobTypeMapper.countByKeyword(query.getKeyword());
+        // 查询数据（单表查询）
+        List<AimJobTypeDO> records = jobTypeMapper.selectPageByKeyword(request.getKeyword(), offset, limit);
+        Long total = jobTypeMapper.countByKeyword(request.getKeyword());
 
-        return CommonResult.pageSuccess(records, total);
+        // Service层完成DO到Response的转换（Controller层不做业务逻辑）
+        List<JobTypeApiResponse> responses = records.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+
+        return CommonResult.pageSuccess(responses, total);
+    }
+
+    /**
+     * 将DO转换为Response（Service层内部转换）
+     */
+    private JobTypeApiResponse convertToResponse(AimJobTypeDO entity) {
+        if (entity == null) {
+            return null;
+        }
+        JobTypeApiResponse response = new JobTypeApiResponse();
+        response.setId(entity.getId());
+        response.setCode(entity.getCode());
+        response.setName(entity.getName());
+        response.setStatus(entity.getStatus());
+        response.setSortOrder(entity.getSortOrder());
+        response.setDescription(entity.getDescription());
+        response.setIsDefault(entity.getIsDefault());
+        response.setCreateTime(entity.getCreateTime());
+        response.setUpdateTime(entity.getUpdateTime());
+        response.setEmployeeCount(0); // TODO: 查询员工数量
+        return response;
     }
 
     @Override
-    public JobTypeDO getById(Long id) {
-        log.info("查询岗位类型详情, id={}", id);
+    public AimJobTypeDO getJobTypeById(Long id) {
+        log.debug("查询岗位类型详情开始, id={}", id);
 
         // 单表查询，直接返回DO
-        JobTypeDO entity = jobTypeMapper.selectByIdExcludeDeleted(id);
+        AimJobTypeDO entity = jobTypeMapper.selectByIdExcludeDeleted(id);
         if (entity == null) {
             throw new BusinessException(ErrorCodeEnum.AGENT_BUSINESS_ERROR, "岗位类型不存在");
         }
@@ -61,24 +88,24 @@ public class JobTypeServiceImpl implements JobTypeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public JobTypeDO create(JobTypeCreateDTO dto) {
-        log.info("创建岗位类型, code={}, name={}", dto.getCode(), dto.getName());
+    public Long createJobType(JobTypeCreateApiRequest request) {
+        log.debug("创建岗位类型开始, code={}, name={}", request.getCode(), request.getName());
 
         // 校验编码唯一性
-        validateCodeUnique(dto.getCode(), null);
+        validateCodeUnique(request.getCode(), null);
 
         // 构建实体
-        JobTypeDO entity = new JobTypeDO();
-        entity.setCode(dto.getCode());
-        entity.setName(dto.getName());
+        AimJobTypeDO entity = new AimJobTypeDO();
+        entity.setCode(request.getCode());
+        entity.setName(request.getName());
         entity.setStatus(1); // 默认启用
-        entity.setSortOrder(dto.getSortOrder());
-        entity.setDescription(dto.getDescription());
-        entity.setIsDefault(dto.getIsDefault());
+        entity.setSortOrder(request.getSortOrder());
+        entity.setDescription(request.getDescription());
+        entity.setIsDefault(request.getIsDefault());
         entity.setIsDeleted(0);
 
         // 处理默认标记
-        if (Integer.valueOf(1).equals(dto.getIsDefault())) {
+        if (Integer.valueOf(1).equals(request.getIsDefault())) {
             handleDefaultFlag(null);
         }
 
@@ -86,41 +113,41 @@ public class JobTypeServiceImpl implements JobTypeService {
         jobTypeMapper.insert(entity);
 
         log.info("创建岗位类型成功, id={}", entity.getId());
-        return entity;
+        return entity.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public JobTypeDO update(JobTypeUpdateDTO dto) {
-        log.info("更新岗位类型, id={}, name={}", dto.getId(), dto.getName());
+    public boolean updateJobType(JobTypeUpdateApiRequest request) {
+        log.debug("更新岗位类型开始, id={}, name={}", request.getId(), request.getName());
 
         // 校验岗位类型是否存在
-        JobTypeDO existing = jobTypeMapper.selectByIdExcludeDeleted(dto.getId());
+        AimJobTypeDO existing = jobTypeMapper.selectByIdExcludeDeleted(request.getId());
         if (existing == null) {
             throw new BusinessException(ErrorCodeEnum.AGENT_BUSINESS_ERROR, "岗位类型不存在");
         }
 
         // 处理默认标记
-        if (Integer.valueOf(1).equals(dto.getIsDefault())) {
-            handleDefaultFlag(dto.getId());
+        if (Integer.valueOf(1).equals(request.getIsDefault())) {
+            handleDefaultFlag(request.getId());
         }
 
         // 更新字段
-        existing.setName(dto.getName());
-        existing.setSortOrder(dto.getSortOrder());
-        existing.setDescription(dto.getDescription());
-        existing.setIsDefault(dto.getIsDefault());
+        existing.setName(request.getName());
+        existing.setSortOrder(request.getSortOrder());
+        existing.setDescription(request.getDescription());
+        existing.setIsDefault(request.getIsDefault());
 
-        jobTypeMapper.updateById(existing);
+        int affectedRows = jobTypeMapper.updateById(existing);
 
-        log.info("更新岗位类型成功, id={}", dto.getId());
-        return existing;
+        log.info("更新岗位类型成功, id={}, affectedRows={}", request.getId(), affectedRows);
+        return affectedRows > 0;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStatus(Long id, Integer status) {
-        log.info("更新岗位类型状态, id={}, status={}", id, status);
+        log.debug("更新岗位类型状态开始, id={}, status={}", id, status);
 
         // 校验岗位类型是否存在
         JobTypeDO existing = jobTypeMapper.selectByIdExcludeDeleted(id);
@@ -137,8 +164,8 @@ public class JobTypeServiceImpl implements JobTypeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void delete(Long id) {
-        log.info("删除岗位类型, id={}", id);
+    public void deleteJobType(Long id) {
+        log.debug("删除岗位类型开始, id={}", id);
 
         // 校验岗位类型是否存在
         JobTypeDO existing = jobTypeMapper.selectByIdExcludeDeleted(id);
@@ -167,7 +194,7 @@ public class JobTypeServiceImpl implements JobTypeService {
     @Override
     public Integer countEmployeesByJobTypeId(Long jobTypeId) {
         // TODO: 实现员工数量统计，需要注入 EmployeeMapper
-        // 暂时返回0，后续实现
+        log.warn("员工数量统计功能暂未实现, jobTypeId: {}", jobTypeId);
         return 0;
     }
 

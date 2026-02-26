@@ -1,27 +1,25 @@
-package com.aim.mall.agent.domain.dto;
+package com.aim.mall.admin.domain.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.io.Serializable;
 
 /**
- * 岗位类型更新DTO
+ * 岗位类型更新请求（管理端）
  *
  * @author Qoder
  * @since 2026/2/26
  */
 @Data
-public class JobTypeUpdateDTO implements Serializable {
+public class JobTypeUpdateRequest implements Serializable {
 
     private static final long serialVersionUID = -1L;
 
     /**
-     * 岗位ID
+     * 岗位类型ID
      */
-    @NotNull(message = "岗位ID不能为空")
     private Long id;
 
     /**

@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public CommonResult handleBusinessException(BusinessException e) {
-        log.error("业务异常: {}", e.getMessage(), e);
+        log.warn("业务异常: {}", e.getMessage());
         // 如果异常对象中包含错误码，则使用异常对象的错误码，否则返回该模块系统内部异常
         IErrorCode errorCode = e.getErrorCode() != null ? e.getErrorCode() : ErrorCodeEnum.AGENT_OTHER_ERROR;
         return CommonResult.failed(errorCode);
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public CommonResult handleMethodArgumentValidationException(MethodArgumentValidationException e) {
-        log.error("参数校验异常: {}", e.getMessage(), e);
+        log.warn("参数校验异常: {}", e.getMessage());
         // 如果异常对象中包含错误码，则使用异常对象的错误码，否则返回该模块系统内部异常
         IErrorCode errorCode = e.getErrorCode() != null ? e.getErrorCode() : ErrorCodeEnum.AGENT_OTHER_ERROR;
         return CommonResult.failed(errorCode, e.getMessage());

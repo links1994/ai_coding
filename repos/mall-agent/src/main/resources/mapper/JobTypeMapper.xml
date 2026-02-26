@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aim.mall.agent.mapper.JobTypeMapper">
+
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        id, code, name, status, sort_order, description, is_default, create_time, update_time, is_deleted
+    </sql>
+
+    <!-- 基础表 -->
+    <sql id="Base_Table">
+        aim_job_type
+    </sql>
+
+    <!-- 基础查询条件（排除已删除） -->
+    <sql id="Base_Where_Not_Deleted">
+        WHERE is_deleted = 0
+    </sql>
+
+    <!-- 根据编码查询岗位类型（排除已删除） -->
+    <select id="selectByCode" resultType="com.aim.mall.agent.domain.entity.AimJobTypeDO">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="Base_Table"/>
+        <include refid="Base_Where_Not_Deleted"/>
+        AND code = #{code}
+        LIMIT 1
+    </select>
+
+    <!-- 根据编码查询数量（排除指定ID，用于唯一性校验） -->
+    <select id="countByCodeExcludeId" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM
+        <include refid="Base_Table"/>
+        <include refid="Base_Where_Not_Deleted"/>
+        AND code = #{code}
+        AND id != #{excludeId}
+    </select>
+
+    <!-- 根据编码查询数量 -->
+    <select id="countByCode" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM
+        <include refid="Base_Table"/>
+        <include refid="Base_Where_Not_Deleted"/>
+        AND code = #{code}
+    </select>
+
+    <!-- 查询所有启用的岗位类型（按排序号升序） -->
+    <select id="selectEnabledList" resultType="com.aim.mall.agent.domain.entity.AimJobTypeDO">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="Base_Table"/>
+        <include refid="Base_Where_Not_Deleted"/>
+        AND status = 1
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 根据ID查询岗位类型（排除已删除） -->
+    <select id="selectByIdExcludeDeleted" resultType="com.aim.mall.agent.domain.entity.AimJobTypeDO">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="Base_Table"/>
+        <include refid="Base_Where_Not_Deleted"/>
+        AND id = #{id}
+        LIMIT 1
+    </select>
+
+    <!-- 查询默认岗位类型 -->
+    <select id="selectDefaultJobType" resultType="com.aim.mall.agent.domain.entity.AimJobTypeDO">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="Base_Table"/>
+        <include refid="Base_Where_Not_Deleted"/>
+        AND is_default = 1
+        LIMIT 1
+    </select>
+
+    <!-- 清除其他岗位的默认标记 -->
+    <update id="clearOtherDefaultFlag">
+        UPDATE
+        <include refid="Base_Table"/>
+        SET is_default = 0, update_time = NOW()
+        <include refid="Base_Where_Not_Deleted"/>
+        AND id != #{excludeId}
+        AND is_default = 1
+    </update>
+
+    <!-- 根据关键字分页查询岗位类型 -->
+    <select id="selectPageByKeyword" resultType="com.aim.mall.agent.domain.entity.AimJobTypeDO">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="Base_Table"/>
+        <include refid="Base_Where_Not_Deleted"/>
+        <if test="keyword != null and keyword != ''">
+            AND (name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY sort_order ASC, create_time DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 根据关键字查询总数 -->
+    <select id="countByKeyword" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM
+        <include refid="Base_Table"/>
+        <include refid="Base_Where_Not_Deleted"/>
+        <if test="keyword != null and keyword != ''">
+            AND (name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+    </select>
+
+</mapper>

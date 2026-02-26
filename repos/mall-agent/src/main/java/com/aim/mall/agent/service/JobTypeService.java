@@ -1,9 +1,10 @@
 package com.aim.mall.agent.service;
 
-import com.aim.mall.agent.domain.dto.JobTypeCreateDTO;
-import com.aim.mall.agent.domain.dto.JobTypeListQuery;
-import com.aim.mall.agent.domain.dto.JobTypeUpdateDTO;
-import com.aim.mall.agent.domain.entity.JobTypeDO;
+import com.aim.mall.agent.api.dto.request.JobTypeCreateApiRequest;
+import com.aim.mall.agent.api.dto.request.JobTypeListApiRequest;
+import com.aim.mall.agent.api.dto.request.JobTypeUpdateApiRequest;
+import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
+import com.aim.mall.agent.domain.entity.AimJobTypeDO;
 import com.mall.common.api.CommonResult;
 
 import java.util.List;
@@ -17,12 +18,12 @@ import java.util.List;
 public interface JobTypeService {
 
     /**
-     * 分页查询岗位类型列表（单表查询，返回DO）
+     * 分页查询岗位类型列表（Service层完成DO到Response的转换）
      *
      * @param query 查询参数
-     * @return 分页结果
+     * @return 分页结果（返回Response）
      */
-    CommonResult<CommonResult.PageData<JobTypeDO>> list(JobTypeListQuery query);
+    CommonResult<CommonResult.PageData<JobTypeApiResponse>> pageJobType(JobTypeListApiRequest request);
 
     /**
      * 根据ID查询岗位类型详情（单表查询，返回DO）
@@ -30,23 +31,23 @@ public interface JobTypeService {
      * @param id 岗位ID
      * @return 岗位类型详情
      */
-    JobTypeDO getById(Long id);
+    AimJobTypeDO getJobTypeById(Long id);
 
     /**
-     * 创建岗位类型（单表操作，返回DO）
+     * 创建岗位类型（单表操作）
      *
-     * @param dto 创建DTO
-     * @return 创建的岗位类型
+     * @param request 创建请求
+     * @return 新记录ID
      */
-    JobTypeDO create(JobTypeCreateDTO dto);
+    Long createJobType(JobTypeCreateApiRequest request);
 
     /**
-     * 更新岗位类型（单表操作，返回DO）
+     * 更新岗位类型（单表操作）
      *
-     * @param dto 更新DTO
-     * @return 更新后的岗位类型
+     * @param request 更新请求
+     * @return 是否成功
      */
-    JobTypeDO update(JobTypeUpdateDTO dto);
+    boolean updateJobType(JobTypeUpdateApiRequest request);
 
     /**
      * 更新岗位类型状态
@@ -61,7 +62,7 @@ public interface JobTypeService {
      *
      * @param id 岗位ID
      */
-    void delete(Long id);
+    void deleteJobType(Long id);
 
     /**
      * 查询岗位类型关联的员工数量

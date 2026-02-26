@@ -1,21 +1,30 @@
-package com.aim.mall.admin.api.dto.request;
+package com.aim.mall.admin.domain.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.io.Serializable;
 
 /**
- * 岗位类型更新请求（管理端）
+ * 岗位类型创建请求（管理端）
  *
  * @author Qoder
  * @since 2026/2/26
  */
 @Data
-public class JobTypeUpdateRequest implements Serializable {
+public class JobTypeCreateRequest implements Serializable {
 
     private static final long serialVersionUID = -1L;
+
+    /**
+     * 岗位编码
+     */
+    @NotBlank(message = "岗位编码不能为空")
+    @Size(min = 1, max = 32, message = "岗位编码长度必须在1-32之间")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "岗位编码只能包含字母、数字和下划线")
+    private String code;
 
     /**
      * 显示名称
