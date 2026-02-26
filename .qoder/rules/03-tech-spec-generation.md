@@ -7,21 +7,22 @@ description: 技术规格书生成规范
 
 ### 1.1 目标
 
-基于确认后的需求和架构规范，生成详细的技术规格书，指导后续代码实现。
+基于确认后的需求和架构规范，生成详细的技术规格书，指导后续代码实现。支持迭代修正，当设计不满足要求时，可接受用户补充上下文或修改意见，并智能判断是否需要同步更新需求文档。
 
 ### 1.2 输入
 
 - `artifacts/spec/{program_id}/requirements/decomposition.md` — 需求拆分结果
-- `artifacts/spec/{program_id}/clarification/answers.md` — 澄清确认结果
-- `artifacts/spec/{program_id}/clarification/decisions.md` — 技术决策记录
+- `artifacts/spec/{program_id}/requirements/answers/{req_id}.md` — 澄清确认结果
+- `artifacts/spec/{program_id}/requirements/decisions/{req_id}.md` — 技术决策记录
 - `.qoder/rules/05-architecture-standards.md` — 架构规范
+- 用户补充的上下文（现有表结构、接口文档等）
 
 ### 1.3 输出
 
 - `artifacts/spec/{program_id}/design.md` — 主技术规格书
 - `artifacts/spec/{program_id}/api/openapi.yaml` — OpenAPI 定义
-- `artifacts/spec/{program_id}/diagrams/` — 架构图、ER 图
 - `artifacts/spec/{program_id}/checklist.md` — 验收标准
+- （可选）更新的需求文档（decomposition.md, answers/*.md, decisions/*.md）
 
 ---
 
@@ -316,24 +317,96 @@ repos/mall-user/src/main/java/com/aim/mall/user/
 
 ---
 
-## 5. 验收标准
+## 5. 业务规则实现
+
+### 5.1 状态机设计
+
+使用 Mermaid 状态图描述业务状态流转：
+
+```mermaid
+stateDiagram
+    [*] --> CREATED: 创建
+    CREATED --> ACTIVE: 激活
+    ACTIVE --> DISABLED: 禁用
+    DISABLED --> ACTIVE: 启用
+    ACTIVE --> [*]: 删除
+```
+
+### 5.2 校验规则
+
+| 规则名 | 校验内容 | 触发时机 | 实现位置 |
+|--------|----------|----------|----------|
+| 名称唯一性 | 同一租户下名称唯一 | 创建/更新时 | AgentValidator |
+| 技能非空 | 至少绑定一个技能 | 创建时 | AgentService |
+
+### 5.3 业务逻辑流程
+
+关键业务流程的详细实现说明：
+
+```markdown
+#### 创建智能员工流程
+
+1. **参数校验**（Controller 层）
+   - 校验名称格式（长度、特殊字符）
+   - 校验技能列表非空
+
+2. **业务校验**（Service 层）
+   - 校验名称唯一性（查询数据库）
+   - 校验用户权限（调用 mall-user）
+
+3. **数据持久化**
+   - 插入 agent 表
+   - 插入 agent_skill 关联表
+
+4. **后置处理**
+   - 记录操作日志
+   - 发送创建事件（如有）
+```
+
+---
+
+## 6. 验收标准
 
 见 `artifacts/spec/{program_id}/checklist.md`
 
 ---
 
-## 6. 附录
+## 7. 附录
 
-### 6.1 相关文档
+### 7.1 相关文档
 
 - PRD: {PRD路径}
 - 需求拆分: artifacts/spec/{program_id}/requirements/decomposition.md
-- 技术决策: artifacts/spec/{program_id}/clarification/decisions.md
+- 技术决策: artifacts/spec/{program_id}/requirements/decisions/{req_id}.md
 - 架构规范: .qoder/rules/05-architecture-standards.md
 - 编码规范: .qoder/rules/04-coding-standards.md
 
-### 6.2 变更记录
+### 7.2 需求追溯矩阵
 
-| 日期   | 版本   | 变更内容 | 作者    |
-|------|------|------|-------|
-| {日期} | v1.0 | 初始版本 | Agent |
+| 子需求 | 设计章节 | 数据库表 | API 接口 | 实现类 |
+|--------|----------|----------|----------|--------|
+| REQ-001 | 3.1, 4.2 | aim_employee | POST /admin/api/v1/agent | AgentAdminController |
+| REQ-003 | 3.3, 4.2 | aim_employee | POST /inner/api/v1/agent | AgentService |
+| REQ-005 | 2.2 | aim_employee, aim_skill | - | - |
+
+### 7.3 变更影响分析
+
+当技术规格发生变更时，使用以下矩阵判断是否需同步更新需求文档：
+
+| 变更类型 | 影响范围 | 是否需更新需求文档 | 更新目标 |
+|----------|----------|-------------------|----------|
+| 数据库表名/字段变更 | 数据模型 | 是 | decomposition.md |
+| 接口路径/方法变更 | API 设计 | 是 | decomposition.md |
+| 接口字段增减 | API 设计 | 判断 | answers.md（如影响业务规则） |
+| 依赖服务变更 | 架构设计 | 是 | decomposition.md |
+| 状态机变更 | 业务逻辑 | 是 | answers.md, decisions.md |
+| 校验规则变更 | 业务逻辑 | 是 | answers.md |
+| 代码分层调整 | 实现细节 | 否 | - |
+| 缓存/日志策略 | 技术实现 | 否 | - |
+
+### 7.4 变更记录
+
+| 日期   | 版本   | 变更内容 | 作者    | 关联需求变更 |
+|------|------|------|-------|------------|
+| {日期} | v1.0 | 初始版本 | Agent | - |
+| {日期} | v1.1 | 修改表结构 | Agent | REQ-005 字段变更 |
