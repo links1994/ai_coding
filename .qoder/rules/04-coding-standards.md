@@ -61,9 +61,28 @@ private LocalDateTime createdAt;
 
 ## 2. 实现细节规范
 
-### 2.1 DO 转换方式
+### 2.1 DO/DTO 转换方式
 
 **禁止使用** `BeanUtils.copyProperties`，使用手动 convert 方法。
+
+#### 查询返回对象规范
+
+根据查询类型确定返回对象：
+
+| 查询类型 | Mapper返回 | Service返回 | 转换为 |
+|----------|------------|-------------|--------|
+| **单表查询** | `XxxDO` | `XxxDO` | `XxxResponse` (Controller层转换) |
+| **联表查询** | `XxxDTO` | `XxxDTO` | `XxxResponse` (Controller层转换) |
+
+**规范说明：**
+1. **单表查询**：直接返回DO，在Controller层转换为Response
+2. **联表查询**：返回DTO（包含关联数据），在Controller层转换为Response
+3. **Service层职责**：返回DO或DTO，不负责转换为Response
+4. **Controller层职责**：将DO/DTO转换为Response后返回
+
+**DDD风格例外**：
+- 如果采用DDD（领域驱动设计）风格，可以不完全遵循上述模式
+- DDD风格下可以在Application层直接返回Domain对象或使用专门的Assembler进行转换
 
 ### 2.2 数据库访问规范
 
@@ -91,21 +110,22 @@ private LocalDateTime createdAt;
 
 #### 类命名
 
-| 类型 | 命名规则 | 示例 |
-|------|----------|------|
-| 实体类 | 大驼峰 + DO 后缀 | `AgentDO`、`UserDO` |
-| DTO | 大驼峰 + DTO 后缀 | `AgentDTO`、`AgentCreateDTO` |
-| VO | 大驼峰 + VO 后缀 | `AgentVO` |
-| Request | 大驼峰 + Request 后缀 | `AgentCreateRequest` |
-| Response | 大驼峰 + Response 后缀 | `AgentResponse` |
-| Service | 大驼峰 + Service 后缀 | `AgentService` |
-| ServiceImpl | 大驼峰 + ServiceImpl 后缀 | `AgentServiceImpl` |
-| Mapper | 大驼峰 + Mapper 后缀 | `AgentMapper` |
-| Controller | 大驼峰 + Controller 后缀 | `AgentController` |
-| FeignClient | 大驼峰 + FeignClient 后缀 | `AgentFeignClient` |
-| Config | 大驼峰 + Config 后缀 | `FeignConfig` |
-| Exception | 大驼峰 + Exception 后缀 | `BusinessException` |
-| Enum | 大驼峰 + Enum 后缀 | `AgentStatusEnum` |
+| 类型 | 命名规则 | 示例 | 说明 |
+|------|----------|------|------|
+| 实体类 | 大驼峰 + DO 后缀 | `AgentDO`、`UserDO` | 数据库实体 |
+| VO | 大驼峰 + VO 后缀 | `AgentVO` | 视图对象 |
+| Request | 大驼峰 + Request 后缀 | `AgentCreateRequest` | **仅用于Controller层入参** |
+| Response | 大驼峰 + Response 后缀 | `AgentResponse` | **仅用于Controller层出参** |
+| Query | 大驼峰 + Query 后缀 | `AgentListQuery` | **Service层查询参数**，用于解耦 |
+| DTO | 大驼峰 + DTO 后缀 | `AgentDTO` | 内部数据传输对象 |
+| Service | 大驼峰 + Service 后缀 | `AgentService` | 服务接口 |
+| ServiceImpl | 大驼峰 + ServiceImpl 后缀 | `AgentServiceImpl` | 服务实现 |
+| Mapper | 大驼峰 + Mapper 后缀 | `AgentMapper` | 数据访问层 |
+| Controller | 大驼峰 + Controller 后缀 | `AgentController` | 控制器 |
+| FeignClient | 大驼峰 + FeignClient 后缀 | `AgentFeignClient` | Feign客户端 |
+| Config | 大驼峰 + Config 后缀 | `FeignConfig` | 配置类 |
+| Exception | 大驼峰 + Exception 后缀 | `BusinessException` | 异常类 |
+| Enum | 大驼峰 + Enum 后缀 | `AgentStatusEnum` | 枚举类 |
 
 #### 方法命名
 
@@ -150,20 +170,38 @@ private boolean active;     // 布尔值无前缀
 │   └── impl/
 ├── mapper/              # 基础设施层
 ├── domain/              # 领域层
-│   ├── entity/          # 实体类
+│   ├── entity/          # 实体类 (XxxDO)
+│   ├── dto/             # 内部DTO (XxxDTO, XxxQuery) - **非对外API用**
 │   ├── enums/           # 枚举类（非远程调用相关）
-│   ├── vo/              # 视图对象
+│   ├── vo/              # 视图对象 (XxxVO)
 │   └── exception/       # 异常类
-├── api/                 # API 传输层
-│   ├── dto/             # 传输对象
-│   │   ├── request/     # 请求对象 (XxxRequest)
-│   │   └── response/    # 响应对象 (XxxResponse)
+├── api/                 # API 传输层（仅门面服务需要）
+│   ├── dto/
+│   │   ├── request/     # 请求对象 (XxxRequest) - **仅Controller入参**
+│   │   └── response/    # 响应对象 (XxxResponse) - **仅Controller出参**
 │   ├── enums/           # 枚举类（远程调用相关）
 │   └── feign/           # Feign 客户端
 ├── mq/                  # 消息队列
 │   └── consumer/        # 消息消费者
 └── config/              # 配置类
 ```
+
+#### 对象类型使用规范
+
+**严格区分以下对象类型：**
+
+| 对象类型 | 包位置 | 使用场景 | 命名示例 |
+|----------|--------|----------|----------|
+| **Request** | `api/dto/request/` | **仅Controller层入参** | `JobTypeCreateRequest` |
+| **Response** | `api/dto/response/` | **仅Controller层出参** | `JobTypeResponse` |
+| **Query** | `domain/dto/` | **Service层查询参数**，Controller到Service的转换 | `JobTypeListQuery` |
+| **DTO** | `domain/dto/` | **内部数据传输**，Service层内部使用 | `JobTypeDTO` |
+
+**关键约束：**
+1. **Request/Response 仅用于Controller层**，不直接传递到Service层
+2. **Controller层负责转换**：`XxxRequest` → `XxxQuery`/`XxxDTO` → 调用Service
+3. **Service层使用Query/DTO**：Service接口入参只能是 `XxxQuery` 或 `XxxDTO`，不能是 `XxxRequest`
+4. **非对外对象不要放在api目录**：内部使用的DTO统一放在 `domain/dto/`
 
 ### 3.3 参数注解规范
 

@@ -127,7 +127,7 @@ graph TD
 **路径参数规范**：
 - 允许使用路径参数，但**最多只有一个**
 - 路径参数必须放在 URL 最后
-- 推荐格式：`/resource/{id}/action` 或 `/resource/{id}`
+- 推荐格式：`/resource/action/{id}`
 
 ### 3.2 应用服务（mall-agent/mall-user）
 

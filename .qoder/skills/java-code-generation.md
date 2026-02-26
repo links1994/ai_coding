@@ -71,18 +71,45 @@ tools: Read, Write, Grep, Glob
 │   └── impl/
 ├── mapper/              # 基础设施层
 ├── domain/              # 领域层
-│   ├── entity/          # 实体类
+│   ├── entity/          # 实体类 (XxxDO)
+│   ├── dto/             # 内部DTO (XxxDTO, XxxQuery)
 │   ├── enums/           # 枚举类
-│   ├── vo/              # 视图对象
+│   ├── vo/              # 视图对象 (XxxVO)
 │   └── exception/       # 异常类
-├── api/                 # API 传输层
+├── api/                 # API 传输层（仅门面服务需要）
 │   ├── dto/
-│   │   ├── request/     # 请求对象
-│   │   └── response/    # 响应对象
+│   │   ├── request/     # 请求对象 (XxxRequest) - 仅Controller入参
+│   │   └── response/    # 响应对象 (XxxResponse) - 仅Controller出参
 │   ├── enums/           # 远程调用相关枚举
 │   └── feign/           # Feign 客户端
 └── config/              # 配置类
 ```
+
+#### 对象类型规范
+
+| 对象类型 | 包位置 | 使用场景 | 命名规则 |
+|----------|--------|----------|----------|
+| Request | `api/dto/request/` | Controller层入参 | `XxxRequest` |
+| Response | `api/dto/response/` | Controller层出参 | `XxxResponse` |
+| Query | `domain/dto/` | Service层查询参数 | `XxxQuery` |
+| DTO | `domain/dto/` | 内部数据传输（联表查询） | `XxxDTO` |
+| DO | `domain/entity/` | 数据库实体（单表） | `XxxDO` |
+
+**重要约束：**
+- Request/Response **仅用于Controller层**，不直接传递到Service层
+- Controller层负责转换：Request → Query/DTO → 调用Service
+- Service层入参只能是Query或DTO，不能是Request
+
+#### 查询返回对象规范
+
+| 查询类型 | Mapper返回 | Service返回 | Controller转换 |
+|----------|------------|-------------|----------------|
+| **单表查询** | `XxxDO` | `XxxDO` | `XxxDO` → `XxxResponse` |
+| **联表查询** | `XxxDTO` | `XxxDTO` | `XxxDTO` → `XxxResponse` |
+
+- 单表查询直接返回DO，联表查询返回DTO
+- Service层返回DO或DTO，Controller层负责转换为Response
+- DDD风格可例外处理
 
 #### 接口风格
 
@@ -107,6 +134,7 @@ tools: Read, Write, Grep, Glob
 ## 生成摘要
 
 | 服务 | 状态 | 代码文件数 | 主要类 |
+
 |------|------|------------|--------|
 | mall-user | 完成 | 12 | UserController, UserService, UserMapper |
 | mall-agent | 完成 | 18 | AgentController, AgentService, AgentMapper |
