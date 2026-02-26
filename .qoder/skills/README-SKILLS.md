@@ -11,6 +11,7 @@
 | Skill     | 文件                         | 说明                        | 使用时机    |
 |-----------|----------------------------|---------------------------|---------|
 | 需求分解 | `prd-decomposition.md`     | 根据 PRD 进行需求拆解，生成子需求列表和依赖关系 | Phase 1 |
+| 需求澄清 | `requirement-clarification.md` | 使用 ReAct 模式进行交互式需求澄清 | Phase 2 |
 | Java 代码生成 | `java-code-generation.md`  | 根据技术规格书生成 Java 微服务代码      | Phase 4 |
 | HTTP 测试生成 | `http-test-generation.md`  | 为 Controller 生成 HTTP 测试文件 | Phase 5 |
 | 代码质量分析    | `code-quality-analysis.md` | 对生成的代码进行质量分析和优化           | Phase 6 |
