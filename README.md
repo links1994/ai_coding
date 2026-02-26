@@ -76,9 +76,8 @@ ai_coding/
 │       ├── http-test-generation.md    # HTTP test generation
 │       ├── code-quality-analysis.md   # Code quality analysis
 │       ├── feature-archiving.md       # Feature archiving
-│       ├── feature-retrieval.md       # Feature retrieval
-│       ├── dependency-query.md        # Dependency query
-│       └── offline-doc-query.md       # Offline documentation query
+│       ├── knowledge-base-query.md    # Knowledge base query
+│       └── dependency-query.md        # Dependency query
 │
 ├── inputs/                            # Input documents directory
 │   └── prd/                           # Product requirement documents (PRD)
@@ -438,9 +437,8 @@ Skills are **reusable capability modules** that perform specific tasks.
 | HTTP Test Generation | `http-test-generation.md` | Generate HTTP test files | Phase 5 |
 | Code Quality Analysis | `code-quality-analysis.md` | Analyze code quality | Phase 6 |
 | Feature Archiving | `feature-archiving.md` | Archive completed features | After feature completion |
-| Feature Retrieval | `feature-retrieval.md` | Query archived features | Before new development |
+| Knowledge Base Query | `knowledge-base-query.md` | Query knowledge base (features, specs, docs) | When needed |
 | Dependency Query | `dependency-query.md` | Query module dependencies | When needed |
-| Offline Doc Query | `offline-doc-query.md` | Query local documentation | When needed |
 
 **How to use**:
 ```
@@ -765,7 +763,7 @@ mvn clean install
 | `http-test-generation.md` | Test generation |
 | `code-quality-analysis.md` | Quality analysis |
 | `feature-archiving.md` | Feature archiving |
-| `feature-retrieval.md` | Feature retrieval |
+| `knowledge-base-query.md` | Knowledge base query |
 
 ---
 

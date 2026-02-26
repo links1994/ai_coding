@@ -76,9 +76,8 @@ ai_coding/
 │       ├── http-test-generation.md    # HTTP 测试生成
 │       ├── code-quality-analysis.md   # 代码质量分析
 │       ├── feature-archiving.md       # 功能归档
-│       ├── feature-retrieval.md       # 功能检索
-│       ├── dependency-query.md        # 依赖查询
-│       └── offline-doc-query.md       # 离线文档查询
+│       ├── knowledge-base-query.md    # 知识库查询
+│       └── dependency-query.md        # 依赖查询
 │
 ├── inputs/                            # 输入文档目录
 │   └── prd/                           # 产品需求文档（PRD）
@@ -438,9 +437,8 @@ PROGRAMS/
 | HTTP 测试生成 | `http-test-generation.md` | 生成 HTTP 测试文件 | 阶段 5 |
 | 代码质量分析 | `code-quality-analysis.md` | 分析代码质量 | 阶段 6 |
 | 功能归档 | `feature-archiving.md` | 归档已完成功能 | 功能完成后 |
-| 功能检索 | `feature-retrieval.md` | 查询已归档功能 | 新开发前 |
+| 知识库查询 | `knowledge-base-query.md` | 查询知识库（功能、规范、文档） | 需要时 |
 | 依赖查询 | `dependency-query.md` | 查询模块依赖 | 需要时 |
-| 离线文档查询 | `offline-doc-query.md` | 查询本地文档 | 需要时 |
 
 **使用方法**：
 ```
@@ -765,7 +763,7 @@ mvn clean install
 | `http-test-generation.md` | 测试生成 |
 | `code-quality-analysis.md` | 质量分析 |
 | `feature-archiving.md` | 功能归档 |
-| `feature-retrieval.md` | 功能检索 |
+| `knowledge-base-query.md` | 知识库查询 |
 
 ---
 

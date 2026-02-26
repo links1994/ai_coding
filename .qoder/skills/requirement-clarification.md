@@ -82,7 +82,12 @@ Implementation Program 命名规范：`{父ID}-REQ-xxx`
    - 读取 decomposition.md 定位目标需求
    - 读取澄清规范
 
-2. **检查现有状态**
+2. **知识库查询（可选）**
+   - 使用 knowledge-base-query Skill 查询是否已有类似功能实现
+   - 查询不确定是否存在的功能或接口
+   - 参考已有功能的设计，辅助生成澄清问题
+
+3. **检查现有状态**
    - 检查是否已有 `workspace/questions.md`
    - 检查是否已有 `workspace/answers.md`
    - 确定当前澄清进度

@@ -21,9 +21,10 @@
 
 | Skill  | 文件                     | 说明                            | 使用时机    |
 |--------|------------------------|-------------------------------|---------|
+| 知识库查询 | `knowledge-base-query.md` | **统一查询 repowiki 知识库**，支持功能档案、技术规范、API文档、框架文档等 | 任何需要查询时 |
 | 业务功能归档 | `feature-archiving.md` | 将已完成功能归档到 repowiki，支持下次迭代复用   | 功能完成后   |
-| 功能检索   | `feature-retrieval.md` | 查询 repowiki 中已归档的功能，快速找到可复用功能 | 新功能开发前  |
-| 离线文档查询 | `offline-doc-query.md` | 查询本地文档资源                      | 需要技术参考时 |
+| ~~功能检索~~   | ~~`feature-retrieval.md`~~ | ~~【已废弃】请使用 `knowledge-base-query`~~ | - |
+| ~~离线文档查询~~ | ~~`offline-doc-query.md`~~ | ~~【已废弃】请使用 `knowledge-base-query`~~ | - |
 
 ---
 
