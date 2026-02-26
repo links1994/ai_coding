@@ -1,0 +1,44 @@
+program: P-2026-001-REQ-018
+name: '[mall-admin] 岗位管理接口组'
+status: active
+
+current_phase: 开发实现
+current_task: 代码生成与实现
+
+phases:
+  - name: 需求澄清
+    status: completed
+    started_at: 2026-02-26
+    completed_at: 2026-02-26
+  - name: 技术规格
+    status: completed
+    started_at: 2026-02-26
+    completed_at: 2026-02-26
+  - name: 开发实现
+    status: in_progress
+  - name: 测试验证
+    status: pending
+
+artifacts:
+  - path: workspace/questions.md
+    status: completed
+    desc: 问题清单 (5个问题)
+  - path: workspace/answers.md
+    status: completed
+    desc: 确认结果 (5个确认)
+  - path: workspace/decisions.md
+    status: completed
+    desc: 技术决策记录 (5个ADR)
+  - path: workspace/tech-spec.md
+    status: completed
+    desc: 技术规格书 (完整版)
+  - path: workspace/openapi.yaml
+    status: completed
+    desc: OpenAPI 定义
+  - path: workspace/checklist.md
+    status: completed
+    desc: 验收清单
+
+notes: |
+  从 decomposition.md 的 REQ-018 创建。
+  当前处于需求澄清阶段，需要确认岗位管理的业务规则。

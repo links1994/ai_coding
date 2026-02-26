@@ -1,0 +1,21 @@
+# 写入范围控制
+#
+# write: Agent 可以修改的文件/目录
+# forbidden: 绝对不能写入的文件
+
+write:
+  - repos/mall-admin/src/main/java/com/aim/mall/admin/controller/JobTypeAdminController.java
+  - repos/mall-admin/src/main/java/com/aim/mall/admin/feign/
+  - repos/mall-admin/src/main/java/com/aim/mall/admin/dto/
+  - repos/mall-agent/src/main/java/com/aim/mall/agent/service/JobTypeService.java
+  - repos/mall-agent/src/main/java/com/aim/mall/agent/service/impl/JobTypeServiceImpl.java
+  - repos/mall-agent/src/main/java/com/aim/mall/agent/controller/inner/JobTypeInnerController.java
+  - repos/mall-agent/src/main/java/com/aim/mall/agent/mapper/JobTypeMapper.java
+  - repos/mall-agent/src/main/java/com/aim/mall/agent/entity/JobType.java
+  - repos/mall-agent/src/main/java/com/aim/mall/agent/dto/
+  - repos/mall-agent/src/main/resources/mapper/
+
+forbidden:
+  - .env
+  - repos/*/.env
+  - repos/mall-agent/src/main/resources/db/
