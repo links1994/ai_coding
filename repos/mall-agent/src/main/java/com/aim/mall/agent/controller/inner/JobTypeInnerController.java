@@ -1,7 +1,7 @@
 package com.aim.mall.agent.controller.inner;
 
 import com.aim.mall.agent.api.dto.request.JobTypeCreateApiRequest;
-import com.aim.mall.agent.api.dto.request.JobTypeListApiRequest;
+import com.aim.mall.agent.api.dto.request.JobTypePageApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeStatusApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeUpdateApiRequest;
 import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
@@ -43,7 +43,7 @@ public class JobTypeInnerController {
      */
     @PostMapping("/list")
     public CommonResult<CommonResult.PageData<JobTypeApiResponse>> pageJobType(
-            @RequestBody @Valid JobTypeListApiRequest request) {
+            @RequestBody @Valid JobTypePageApiRequest request) {
 
         // 限制每页最大条数
         request.setPageSize(Math.min(request.getPageSize(), 100));

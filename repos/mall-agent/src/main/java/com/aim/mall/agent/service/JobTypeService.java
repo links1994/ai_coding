@@ -1,7 +1,7 @@
 package com.aim.mall.agent.service;
 
 import com.aim.mall.agent.api.dto.request.JobTypeCreateApiRequest;
-import com.aim.mall.agent.api.dto.request.JobTypeListApiRequest;
+import com.aim.mall.agent.api.dto.request.JobTypePageApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeUpdateApiRequest;
 import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
 import com.aim.mall.agent.domain.entity.AimJobTypeDO;
@@ -23,7 +23,7 @@ public interface JobTypeService {
      * @param request 查询参数
      * @return 分页结果（返回Response）
      */
-    CommonResult<CommonResult.PageData<JobTypeApiResponse>> pageJobType(JobTypeListApiRequest request);
+    CommonResult<CommonResult.PageData<JobTypeApiResponse>> pageJobType(JobTypePageApiRequest request);
 
     /**
      * 根据ID查询岗位类型详情（单表查询，返回DO）

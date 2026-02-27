@@ -1,7 +1,7 @@
 package com.aim.mall.agent.api.feign;
 
 import com.aim.mall.agent.api.dto.request.JobTypeCreateApiRequest;
-import com.aim.mall.agent.api.dto.request.JobTypeListApiRequest;
+import com.aim.mall.agent.api.dto.request.JobTypePageApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeStatusApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeUpdateApiRequest;
 import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
@@ -32,7 +32,7 @@ public interface AgentRemoteService {
      */
     @PostMapping("/list")
     CommonResult<CommonResult.PageData<JobTypeApiResponse>> pageJobType(
-            @RequestBody JobTypeListApiRequest request);
+            @RequestBody JobTypePageApiRequest request);
 
     /**
      * 根据ID查询岗位类型详情

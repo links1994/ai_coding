@@ -1,7 +1,7 @@
 package com.aim.mall.agent.service.impl;
 
 import com.aim.mall.agent.api.dto.request.JobTypeCreateApiRequest;
-import com.aim.mall.agent.api.dto.request.JobTypeListApiRequest;
+import com.aim.mall.agent.api.dto.request.JobTypePageApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeUpdateApiRequest;
 import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
 import com.aim.mall.agent.domain.entity.AimJobTypeDO;
@@ -32,7 +32,7 @@ public class JobTypeServiceImpl implements JobTypeService {
     private final JobTypeMapper jobTypeMapper;
 
     @Override
-    public CommonResult<CommonResult.PageData<JobTypeApiResponse>> pageJobType(JobTypeListApiRequest request) {
+    public CommonResult<CommonResult.PageData<JobTypeApiResponse>> pageJobType(JobTypePageApiRequest request) {
         log.debug("查询岗位类型列表开始, keyword={}, pageNum={}, pageSize={}",
                 request.getKeyword(), request.getPageNum(), request.getPageSize());
 

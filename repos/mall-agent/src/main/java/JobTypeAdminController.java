@@ -3,7 +3,7 @@ package com.aim.mall.admin.controller;
 import com.aim.mall.admin.domain.dto.request.JobTypeCreateRequest;
 import com.aim.mall.admin.domain.dto.request.JobTypeStatusRequest;
 import com.aim.mall.admin.domain.dto.request.JobTypeUpdateRequest;
-import com.aim.mall.agent.api.dto.request.JobTypeListApiRequest;
+import com.aim.mall.agent.api.dto.request.JobTypePageApiRequest;
 import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
 import com.aim.mall.agent.api.feign.AgentRemoteService;
 import com.aim.mall.common.api.CommonResult;
@@ -62,7 +62,7 @@ public class JobTypeAdminController {
         log.debug("查询岗位类型列表开始, keyword={}, pageNum={}, pageSize={}", keyword, pageNum, pageSize);
 
         // 构建查询参数
-        JobTypeListApiRequest apiRequest = new JobTypeListApiRequest();
+        JobTypePageApiRequest apiRequest = new JobTypePageApiRequest();
         apiRequest.setKeyword(keyword);
         apiRequest.setPageNum(pageNum);
         apiRequest.setPageSize(pageSize);
