@@ -48,6 +48,18 @@ repos:
     package: com.aim.mall.user
     status: active
 
+  # API 模块（内部服务间调用）
+  mall-inner-api:
+    path: repos/mall-inner-api
+    desc: 内部 API 模块集合（包含 mall-agent-api, mall-user-api 等）
+    lang: Java
+    framework: Spring Cloud
+    package: com.aim.mall
+    status: active
+    modules:
+      - mall-agent-api
+      - mall-user-api
+
 # ==================== 服务调用关系 ====================
 service_dependencies:
   mall-admin:

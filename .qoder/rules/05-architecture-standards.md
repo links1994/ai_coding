@@ -483,31 +483,38 @@ DEFAULT CHARSET=utf8mb4;
 
 ### 6.1 设计原则
 
-**独立 API 模块**：每个业务模块提供独立的 API 模块（`mall-{模块}-api`），供其他服务引用。
+**独立 API 模块**：每个业务模块提供独立的 API 模块（`mall-{模块}-api`），统一放在 `repos/mall-inner-api` 目录下，供其他服务引用。
 
 **目的**：
 - 解耦服务间调用接口
 - 避免被调用服务暴露内部实现
 - 统一管理和版本控制远程调用接口
+- 集中管理所有内部服务间调用的 API 定义
 
 ### 6.2 目录结构
 
+所有 API 模块统一放在 `repos/mall-inner-api/` 目录下：
+
 ```
-mall-agent-api/                          # 独立的 API 模块
-├── src/main/java/com/aim/mall/agent/
-│   └── api/
-│       ├── dto/
-│       │   ├── request/                 # 远程调用请求参数
-│       │   │   ├── JobTypeCreateRequest.java
-│       │   │   ├── JobTypeUpdateRequest.java
-│       │   │   └── JobTypeListQuery.java
-│       │   └── response/                # 远程调用返回值
-│       │       └── JobTypeResponse.java
-│       ├── enums/                       # 远程接口使用的枚举
-│       │   └── JobTypeStatusEnum.java
-│       └── feign/                       # Feign 客户端
-│           └── JobTypeFeignClient.java
-└── pom.xml
+repos/mall-inner-api/
+├── mall-agent-api/                      # 智能员工模块 API
+│   ├── src/main/java/com/aim/mall/agent/
+│   │   └── api/
+│   │       ├── dto/
+│   │       │   ├── request/             # 远程调用请求参数
+│   │       │   │   ├── JobTypeCreateRequest.java
+│   │       │   │   ├── JobTypeUpdateRequest.java
+│   │       │   │   └── JobTypeListQuery.java
+│   │       │   └── response/            # 远程调用返回值
+│   │       │       └── JobTypeResponse.java
+│   │       ├── enums/                   # 远程接口使用的枚举
+│   │       │   └── JobTypeStatusEnum.java
+│   │       └── feign/                   # Feign 客户端
+│   │           └── JobTypeFeignClient.java
+│   └── pom.xml
+├── mall-user-api/                       # 用户模块 API
+│   └── ...
+└── pom.xml                              # 父 POM
 ```
 
 ### 6.3 使用方式

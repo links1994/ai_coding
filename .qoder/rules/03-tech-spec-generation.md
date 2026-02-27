@@ -11,18 +11,18 @@ description: 技术规格书生成规范
 
 ### 1.2 输入
 
-- `artifacts/spec/{program_id}/requirements/decomposition.md` — 需求拆分结果
-- `artifacts/spec/{program_id}/requirements/answers/{req_id}.md` — 澄清确认结果
-- `artifacts/spec/{program_id}/requirements/decisions/{req_id}.md` — 技术决策记录
+- `orchestrator/PROGRAMS/{decomposition_program_id}/workspace/decomposition.md` — 需求拆分结果
+- `orchestrator/PROGRAMS/{program_id}/workspace/answers.md` — 澄清确认结果
+- `orchestrator/PROGRAMS/{program_id}/workspace/decisions.md` — 技术决策记录
 - `.qoder/rules/05-architecture-standards.md` — 架构规范
 - 用户补充的上下文（现有表结构、接口文档等）
 
 ### 1.3 输出
 
-- `artifacts/spec/{program_id}/design.md` — 主技术规格书
-- `artifacts/spec/{program_id}/api/openapi.yaml` — OpenAPI 定义
-- `artifacts/spec/{program_id}/checklist.md` — 验收标准
-- （可选）更新的需求文档（decomposition.md, answers/*.md, decisions/*.md）
+- `orchestrator/PROGRAMS/{program_id}/workspace/tech-spec.md` — 主技术规格书
+- `orchestrator/PROGRAMS/{program_id}/workspace/openapi.yaml` — OpenAPI 定义
+- `orchestrator/PROGRAMS/{program_id}/workspace/checklist.md` — 验收标准
+- （可选）更新的需求文档（decomposition.md, answers.md, decisions.md）
 
 ---
 
@@ -105,7 +105,7 @@ CREATE TABLE agent
 
 ### 3.2 OpenAPI 定义
 
-完整 OpenAPI 3.0 定义见: `artifacts/spec/{program_id}/api/openapi.yaml`
+完整 OpenAPI 3.0 定义见: `orchestrator/PROGRAMS/{program_id}/workspace/openapi.yaml`
 
 关键接口示例：
 
@@ -402,7 +402,7 @@ stateDiagram
 
 ## 6. 验收标准
 
-见 `artifacts/spec/{program_id}/checklist.md`
+见 `orchestrator/PROGRAMS/{program_id}/workspace/checklist.md`
 
 ---
 
@@ -411,8 +411,8 @@ stateDiagram
 ### 7.1 相关文档
 
 - PRD: {PRD路径}
-- 需求拆分: artifacts/spec/{program_id}/requirements/decomposition.md
-- 技术决策: artifacts/spec/{program_id}/requirements/decisions/{req_id}.md
+- 需求拆分: `orchestrator/PROGRAMS/{decomposition_program_id}/workspace/decomposition.md`
+- 技术决策: `orchestrator/PROGRAMS/{program_id}/workspace/decisions.md`
 - 架构规范: .qoder/rules/05-architecture-standards.md
 - 编码规范: .qoder/rules/04-coding-standards.md
 
