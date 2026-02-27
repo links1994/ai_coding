@@ -468,6 +468,16 @@ DEFAULT CHARSET=utf8mb4;
 
 ### 5.1 Feign 客户端定义规范
 
+#### 命名规范
+
+**Feign 客户端命名**：`{模块名}RemoteService`
+
+- 位于 `mall-{模块}-api` 模块的 `api/feign/` 包下
+- 统一使用 `RemoteService` 后缀，替代 `FeignClient` 后缀
+- 示例：`AgentRemoteService` (对应 mall-agent-api), `UserRemoteService` (对应 mall-user-api)
+
+#### 接口定义规范
+
 - 查询类：使用 Query 参数，**禁止路径参数**
 - 操作类：使用 RequestBody
 
@@ -510,7 +520,7 @@ repos/mall-inner-api/
 │   │       ├── enums/                   # 远程接口使用的枚举
 │   │       │   └── JobTypeStatusEnum.java
 │   │       └── feign/                   # Feign 客户端
-│   │           └── JobTypeFeignClient.java
+│   │           └── AgentRemoteService.java
 │   └── pom.xml
 ├── mall-user-api/                       # 用户模块 API
 │   └── ...
@@ -536,11 +546,11 @@ repos/mall-inner-api/
 @RequiredArgsConstructor
 public class JobTypeAdminService {
     
-    private final JobTypeFeignClient jobTypeFeignClient;  // 来自 mall-agent-api
+    private final JobTypeRemoteService jobTypeRemoteService;  // 来自 mall-agent-api
     
     public JobTypeResponse getJobType(Long id) {
         // 使用 API 模块中的 Request/Response
-        return jobTypeFeignClient.getJobTypeById(id).getData();
+        return jobTypeRemoteService.getJobTypeById(id).getData();
     }
 }
 ```

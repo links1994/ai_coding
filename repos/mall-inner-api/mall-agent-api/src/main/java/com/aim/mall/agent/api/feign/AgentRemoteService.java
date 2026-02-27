@@ -13,16 +13,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * 岗位类型Feign客户端
+ * 智能员工模块远程服务接口
  * <p>
- * 注意：FeignClient直接对接mall-agent的InnerController，
+ * 注意：RemoteService直接对接mall-agent的InnerController，
  * 数据转换在mall-agent的Service层完成，本层只做转发。
  *
  * @author Qoder
  * @since 2026/2/26
  */
 @FeignClient(name = "mall-agent", path = "/inner/api/v1/job-types")
-public interface JobTypeFeignClient {
+public interface AgentRemoteService {
 
     /**
      * 分页查询岗位类型列表

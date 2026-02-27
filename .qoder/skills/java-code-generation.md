@@ -94,7 +94,8 @@ repos/mall-inner-api/mall-agent-api/src/main/java/com/aim/mall/agent/
     │   ├── request/     # 远程调用请求参数
     │   └── response/    # 远程调用返回值
     ├── enums/           # 远程接口使用的枚举
-    └── feign/           # Feign 客户端
+    └── feign/           # Feign 客户端 (命名: {业务名}RemoteService)
+        └── JobTypeRemoteService.java
 ```
 
 **门面服务（mall-admin）**：
@@ -115,6 +116,7 @@ mall-admin/src/main/java/com/aim/mall/admin/
 |----------|----------|--------|----------|----------|
 | **远程 Request** | API 模块 | `api/dto/request/` | 远程调用请求参数 | `XxxRequest` |
 | **远程 Response** | API 模块 | `api/dto/response/` | 远程调用返回值 | `XxxResponse` |
+| **Feign 客户端** | API 模块 | `api/feign/` | 远程服务调用接口 | `{模块名}RemoteService` |
 | **前端 Request** | 门面服务 | `domain/dto/request/` | 前端请求参数（本地） | `XxxRequest` |
 | **前端 Response** | 门面服务 | `domain/dto/response/` | 前端返回值（本地） | `XxxResponse` / `XxxVO` |
 | **Query** | 应用服务 | `domain/dto/` | Service层查询参数 | `XxxQuery` |
@@ -203,9 +205,9 @@ public class AgentDetailVO implements Serializable {
 // 门面服务 Controller
 @GetMapping("/{agentId}/detail")
 public CommonResult<AgentDetailVO> getAgentDetail(@PathVariable("agentId") Long agentId) {
-    // 调用多个 Feign 客户端获取远程 ApiResponse
-    AgentApiResponse agentApi = agentFeignClient.getById(agentId).getData();
-    UserApiResponse creatorApi = userFeignClient.getById(agentApi.getCreatorId()).getData();
+    // 调用多个 RemoteService 获取远程 ApiResponse
+    AgentApiResponse agentApi = agentRemoteService.getById(agentId).getData();
+    UserApiResponse creatorApi = userRemoteService.getById(agentApi.getCreatorId()).getData();
     
     // 转换为本地 Response
     AgentResponse agent = convertToAgentResponse(agentApi);
@@ -301,8 +303,8 @@ public class AimOrderService extends ServiceImpl<AimOrderMapper, AimOrderDO> {
 |------|------|------------|--------|
 | mall-user | 完成 | 12 | UserController, UserService, UserMapper |
 | mall-agent | 完成 | 18 | AgentController, AgentService, AgentMapper |
-| mall-admin | 完成 | 8 | AgentAdminController, AgentFeignClient |
-| mall-app | 完成 | 8 | AgentClientController, AgentFeignClient |
+| mall-admin | 完成 | 8 | AgentAdminController, AgentRemoteService |
+| mall-app | 完成 | 8 | AgentClientController, AgentRemoteService |
 
 ## 依赖关系
 

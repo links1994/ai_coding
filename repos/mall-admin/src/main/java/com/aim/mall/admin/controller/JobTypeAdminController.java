@@ -5,7 +5,7 @@ import com.aim.mall.admin.domain.dto.request.JobTypeStatusRequest;
 import com.aim.mall.admin.domain.dto.request.JobTypeUpdateRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeListApiRequest;
 import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
-import com.aim.mall.agent.api.feign.JobTypeFeignClient;
+import com.aim.mall.agent.api.feign.AgentRemoteService;
 import com.mall.common.api.CommonResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class JobTypeAdminController {
 
-    private final JobTypeFeignClient jobTypeFeignClient;
+    private final AgentRemoteService agentRemoteService;
 
     /**
      * 分页查询岗位类型列表
@@ -67,8 +67,8 @@ public class JobTypeAdminController {
         apiRequest.setPageNum(pageNum);
         apiRequest.setPageSize(pageSize);
 
-        // Controller层直接转发Feign调用结果，不做业务逻辑处理
-        return jobTypeFeignClient.pageJobType(apiRequest);
+        // Controller层直接转发RemoteService调用结果，不做业务逻辑处理
+        return agentRemoteService.pageJobType(apiRequest);
     }
 
     /**
@@ -84,7 +84,7 @@ public class JobTypeAdminController {
             @PathVariable("jobTypeId") Long jobTypeId) {
 
         log.debug("查询岗位类型详情开始, jobTypeId={}", jobTypeId);
-        return jobTypeFeignClient.getJobTypeById(jobTypeId);
+        return agentRemoteService.getJobTypeById(jobTypeId);
     }
 
     /**
@@ -100,7 +100,7 @@ public class JobTypeAdminController {
             @RequestBody @Valid JobTypeCreateRequest request) {
 
         log.debug("创建岗位类型开始, code={}, name={}", request.getCode(), request.getName());
-        return jobTypeFeignClient.createJobType(request);
+        return agentRemoteService.createJobType(request);
     }
 
     /**
@@ -128,7 +128,7 @@ public class JobTypeAdminController {
         updateRequest.setDescription(request.getDescription());
         updateRequest.setIsDefault(request.getIsDefault());
 
-        return jobTypeFeignClient.updateJobType(updateRequest);
+        return agentRemoteService.updateJobType(updateRequest);
     }
 
     /**
@@ -151,7 +151,7 @@ public class JobTypeAdminController {
         // 设置ID到请求对象
         request.setJobTypeId(jobTypeId);
 
-        return jobTypeFeignClient.updateStatus(request);
+        return agentRemoteService.updateStatus(request);
     }
 
     /**
@@ -167,6 +167,6 @@ public class JobTypeAdminController {
             @PathVariable("jobTypeId") Long jobTypeId) {
 
         log.debug("删除岗位类型开始, jobTypeId={}", jobTypeId);
-        return jobTypeFeignClient.deleteJobType(jobTypeId);
+        return agentRemoteService.deleteJobType(jobTypeId);
     }
 }
