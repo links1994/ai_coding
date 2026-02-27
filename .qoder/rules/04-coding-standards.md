@@ -455,7 +455,6 @@ CommonResult.success(data, "自定义消息");       // 返回成功数据和自
 CommonResult.pageSuccess(items, totalCount);   // 分页成功响应
 
 // 失败响应
-CommonResult.failed("错误信息");              // 通用失败
 CommonResult.failed(errorCode);             // 使用错误码枚举
 CommonResult.failed(errorCode, "错误信息");   // 错误码 + 自定义消息
 ```
