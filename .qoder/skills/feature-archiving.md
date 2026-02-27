@@ -45,7 +45,7 @@ tools: Read, Write, Grep, Glob
 
 ### Step 2: 生成功能档案
 
-1. 读取模板：`artifacts/generated/_TEMPLATE/feature-archive.md`
+1. 读取模板：`.qoder/repowiki/features/_TEMPLATE/feature-archive.md`
 2. 根据功能信息填充模板变量
 3. 生成档案文件：`.qoder/repowiki/features/{feature-id}/{feature-id}-archive.md`
 

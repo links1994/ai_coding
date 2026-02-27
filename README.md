@@ -84,9 +84,9 @@ ai_coding/
 │
 ├── repos/                             # Code repositories directory
 │
-└── artifacts/                         # Generated artifacts directory
-    ├── spec_TEMPLATE/                 # Specification templates
-    └── generated_TEMPLATE/            # Generated code templates
+└── .qoder/repowiki/                   # Knowledge base storage
+    └── feature/                       # Feature archives
+        └── _TEMPLATE/                 # Feature archive templates
 ```
 
 ### 2.1 Directory Purposes
@@ -97,7 +97,7 @@ ai_coding/
 | `.qoder/` | AI configuration and capabilities | Contains rules (standards) and skills (reusable capabilities) |
 | `inputs/` | Input documents storage | Place PRD and other input documents here |
 | `repos/` | Code repositories storage | Contains actual project code repositories |
-| `artifacts/` | Generated outputs storage | Contains specifications, generated code, and other artifacts |
+| `.qoder/repowiki/` | Knowledge base storage | Contains feature archives and reusable templates |
 
 ---
 
@@ -473,24 +473,23 @@ Directory for **code repositories**.
 3. Follow the service architecture defined in `RESOURCE-MAP.yml`
 4. Respect the `SCOPE.yml` write permissions
 
-### 6.6 Using `artifacts/`
+### 6.6 Using `.qoder/repowiki/`
 
-Directory for **generated outputs**.
+Directory for **knowledge base storage**.
 
 **Structure**:
 ```
-artifacts/
-├── spec_{program_id}/          # Generated specifications
-│   ├── design.md
-│   ├── api/
-│   └── diagrams/
-└── generated_{program_id}/     # Generated code artifacts
+.qoder/repowiki/
+└── feature/                    # Feature archives
+    ├── _TEMPLATE/              # Feature archive templates
+    │   └── feature-archive.md
+    └── {feature-name}/         # Archived features
 ```
 
 **How to use**:
-- Specifications are auto-generated during Spec Mode
-- Reference these for implementation
-- Archive completed features for future retrieval
+- Feature archives store completed feature documentation
+- Reference these for similar future implementations
+- Templates provide standardized documentation format
 
 ---
 

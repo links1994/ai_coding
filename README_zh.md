@@ -84,9 +84,9 @@ ai_coding/
 │
 ├── repos/                             # 代码仓库目录
 │
-└── artifacts/                         # 生成产物目录
-    ├── spec_TEMPLATE/                 # 规格书模板
-    └── generated_TEMPLATE/            # 生成代码模板
+└── .qoder/repowiki/                   # 知识库存储
+    └── feature/                       # 功能归档
+        └── _TEMPLATE/                 # 功能归档模板
 ```
 
 ### 2.1 目录用途
@@ -97,7 +97,7 @@ ai_coding/
 | `.qoder/` | AI 配置和能力 | 包含规则（规范）和技能（可复用能力） |
 | `inputs/` | 输入文档存储 | 存放 PRD 和其他输入文档 |
 | `repos/` | 代码仓库存储 | 包含实际的项目代码仓库 |
-| `artifacts/` | 生成输出存储 | 包含规格书、生成代码和其他产物 |
+| `.qoder/repowiki/` | 知识库存储 | 包含功能归档和可复用模板 |
 
 ---
 
@@ -473,24 +473,23 @@ Agent：
 3. 遵循 `RESOURCE-MAP.yml` 中定义的服务架构
 4. 遵守 `SCOPE.yml` 中的写入权限
 
-### 6.6 使用 `artifacts/`
+### 6.6 使用 `.qoder/repowiki/`
 
-**生成输出**目录。
+**知识库存储**目录。
 
 **结构**：
 ```
-artifacts/
-├── spec_{program_id}/          # 生成的规格书
-│   ├── design.md
-│   ├── api/
-│   └── diagrams/
-└── generated_{program_id}/     # 生成的代码产物
+.qoder/repowiki/
+└── feature/                    # 功能归档
+    ├── _TEMPLATE/              # 功能归档模板
+    │   └── feature-archive.md
+    └── {feature-name}/         # 已归档的功能
 ```
 
 **使用方法**：
-- 规格书在规格模式中自动生成
-- 参考这些进行实现
-- 归档已完成功能供将来检索
+- 功能归档存储已完成的功能文档
+- 参考这些用于类似的未来实现
+- 模板提供标准化的文档格式
 
 ---
 
