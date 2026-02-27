@@ -5,7 +5,6 @@ import com.aim.mall.agent.api.dto.request.JobTypePageApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeStatusApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeUpdateApiRequest;
 import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
-import com.aim.mall.agent.domain.entity.AimJobTypeDO;
 import com.aim.mall.agent.service.JobTypeService;
 import com.aim.mall.common.api.CommonResult;
 import jakarta.validation.Valid;
@@ -18,8 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
- * 岗位类型内部接口（供Feign调用）
+ * 岗位类型内部接口控制器
+ * <p>
+ * 供其他服务通过Feign调用
  *
  * @author Qoder
  * @since 2026/2/26
@@ -34,69 +37,63 @@ public class JobTypeInnerController {
 
     /**
      * 分页查询岗位类型列表
-     * <p>
-     * 规范：Controller 层只做参数转换和调用 Service，不做业务逻辑。
-     * 数据转换（DO → Response）在 Service 层完成。
      *
      * @param request 查询参数
      * @return 分页结果
      */
     @PostMapping("/list")
-    public CommonResult<CommonResult.PageData<JobTypeApiResponse>> pageJobType(
-            @RequestBody @Valid JobTypePageApiRequest request) {
-
-        // 限制每页最大条数
-        request.setPageSize(Math.min(request.getPageSize(), 100));
-
-        // 直接返回 Service 结果（转换已在 Service 层完成）
-        return jobTypeService.pageJobType(request);
+    public CommonResult<CommonResult.PageData<JobTypeApiResponse>> pageList(
+            @Valid @RequestBody JobTypePageApiRequest request) {
+        List<JobTypeApiResponse> list = jobTypeService.pageList(request);
+        Long totalCount = jobTypeService.countByKeyword(request.getKeyword());
+        return CommonResult.pageSuccess(list, totalCount);
     }
 
     /**
-     * 根据ID查询岗位类型详情（单表查询，返回DO）
+     * 根据ID查询岗位类型详情
      *
      * @param jobTypeId 岗位ID
      * @return 岗位类型详情
      */
     @GetMapping("/detail")
-    public CommonResult<JobTypeApiResponse> getJobTypeById(@RequestParam("jobTypeId") Long jobTypeId) {
-        AimJobTypeDO entity = jobTypeService.getJobTypeById(jobTypeId);
-        return CommonResult.success(convertToResponse(entity));
+    public CommonResult<JobTypeApiResponse> getById(@RequestParam("jobTypeId") Long jobTypeId) {
+        JobTypeApiResponse response = jobTypeService.getById(jobTypeId);
+        return CommonResult.success(response);
     }
 
     /**
      * 创建岗位类型
      *
-     * @param dto 创建DTO
+     * @param request 创建请求
      * @return 新记录ID
      */
     @PostMapping("/create")
-    public CommonResult<Long> createJobType(@RequestBody @Valid JobTypeCreateApiRequest request) {
-        Long id = jobTypeService.createJobType(request);
+    public CommonResult<Long> create(@Valid @RequestBody JobTypeCreateApiRequest request) {
+        Long id = jobTypeService.create(request);
         return CommonResult.success(id);
     }
 
     /**
      * 更新岗位类型
      *
-     * @param dto 更新DTO
+     * @param request 更新请求
      * @return 成功响应
      */
     @PostMapping("/update")
-    public CommonResult<Void> updateJobType(@RequestBody @Valid JobTypeUpdateApiRequest request) {
-        jobTypeService.updateJobType(request);
+    public CommonResult<Void> update(@Valid @RequestBody JobTypeUpdateApiRequest request) {
+        jobTypeService.update(request);
         return CommonResult.success();
     }
 
     /**
      * 更新岗位类型状态
      *
-     * @param dto 状态更新DTO
+     * @param request 状态更新请求
      * @return 成功响应
      */
     @PostMapping("/status")
-    public CommonResult<Void> updateStatus(@RequestBody @Valid JobTypeStatusApiRequest request) {
-        jobTypeService.updateStatus(request.getId(), request.getStatus());
+    public CommonResult<Void> updateStatus(@Valid @RequestBody JobTypeStatusApiRequest request) {
+        jobTypeService.updateStatus(request);
         return CommonResult.success();
     }
 
@@ -107,29 +104,8 @@ public class JobTypeInnerController {
      * @return 成功响应
      */
     @PostMapping("/delete")
-    public CommonResult<Void> deleteJobType(@RequestParam("jobTypeId") Long jobTypeId) {
-        jobTypeService.deleteJobType(jobTypeId);
+    public CommonResult<Void> delete(@RequestParam("jobTypeId") Long jobTypeId) {
+        jobTypeService.delete(jobTypeId);
         return CommonResult.success();
-    }
-
-    /**
-     * 将 DO 转换为 Response
-     */
-    private JobTypeApiResponse convertToResponse(AimJobTypeDO entity) {
-        if (entity == null) {
-            return null;
-        }
-        JobTypeApiResponse response = new JobTypeApiResponse();
-        response.setId(entity.getId());
-        response.setCode(entity.getCode());
-        response.setName(entity.getName());
-        response.setStatus(entity.getStatus());
-        response.setSortOrder(entity.getSortOrder());
-        response.setDescription(entity.getDescription());
-        response.setIsDefault(entity.getIsDefault());
-        response.setCreateTime(entity.getCreateTime());
-        response.setUpdateTime(entity.getUpdateTime());
-        response.setEmployeeCount(0);
-        return response;
     }
 }

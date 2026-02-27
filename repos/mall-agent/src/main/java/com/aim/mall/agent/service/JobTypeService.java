@@ -2,10 +2,9 @@ package com.aim.mall.agent.service;
 
 import com.aim.mall.agent.api.dto.request.JobTypeCreateApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypePageApiRequest;
+import com.aim.mall.agent.api.dto.request.JobTypeStatusApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeUpdateApiRequest;
 import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
-import com.aim.mall.agent.domain.entity.AimJobTypeDO;
-import com.aim.mall.common.api.CommonResult;
 
 import java.util.List;
 
@@ -18,57 +17,55 @@ import java.util.List;
 public interface JobTypeService {
 
     /**
-     * 分页查询岗位类型列表（Service层完成DO到Response的转换）
+     * 分页查询岗位类型列表
      *
      * @param request 查询参数
-     * @return 分页结果（返回Response）
+     * @return 岗位类型列表
      */
-    CommonResult<CommonResult.PageData<JobTypeApiResponse>> pageJobType(JobTypePageApiRequest request);
+    List<JobTypeApiResponse> pageList(JobTypePageApiRequest request);
 
     /**
-     * 根据ID查询岗位类型详情（单表查询，返回DO）
+     * 根据关键字查询总数
      *
-     * @param id 岗位ID
+     * @param keyword 关键字
+     * @return 总数
+     */
+    Long countByKeyword(String keyword);
+
+    /**
+     * 根据ID查询岗位类型详情
+     *
+     * @param jobTypeId 岗位ID
      * @return 岗位类型详情
      */
-    AimJobTypeDO getJobTypeById(Long id);
+    JobTypeApiResponse getById(Long jobTypeId);
 
     /**
-     * 创建岗位类型（单表操作）
+     * 创建岗位类型
      *
      * @param request 创建请求
      * @return 新记录ID
      */
-    Long createJobType(JobTypeCreateApiRequest request);
+    Long create(JobTypeCreateApiRequest request);
 
     /**
-     * 更新岗位类型（单表操作）
+     * 更新岗位类型
      *
      * @param request 更新请求
-     * @return 是否成功
      */
-    boolean updateJobType(JobTypeUpdateApiRequest request);
+    void update(JobTypeUpdateApiRequest request);
 
     /**
      * 更新岗位类型状态
      *
-     * @param id 岗位ID
-     * @param status 状态（0-禁用，1-启用）
+     * @param request 状态更新请求
      */
-    void updateStatus(Long id, Integer status);
+    void updateStatus(JobTypeStatusApiRequest request);
 
     /**
      * 删除岗位类型
      *
-     * @param id 岗位ID
+     * @param jobTypeId 岗位ID
      */
-    void deleteJobType(Long id);
-
-    /**
-     * 查询岗位类型关联的员工数量
-     *
-     * @param jobTypeId 岗位类型ID
-     * @return 员工数量
-     */
-    Integer countEmployeesByJobTypeId(Long jobTypeId);
+    void delete(Long jobTypeId);
 }

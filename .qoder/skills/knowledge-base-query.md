@@ -48,6 +48,17 @@ tools: Read, Grep, Glob
 │   ├── index.md          # 功能索引
 │   ├── F-001-xxx/        # 具体功能档案
 │   └── F-002-xxx/
+├── pitfalls/             # 历史坑点档案
+│   ├── index.md          # 坑点索引
+│   ├── feign/            # Feign 相关坑点
+│   │   ├── feign-client-duplication.md
+│   │   └── facade-feign-prohibition.md
+│   ├── naming/           # 命名规范坑点
+│   │   └── module-based-naming.md
+│   ├── architecture/     # 架构规范坑点
+│   │   └── service-layer-violation.md
+│   └── maven/            # Maven 依赖坑点
+│       └── dependency-conflict.md
 ├── zh/docs/              # 中文文档
 │   ├── specs/            # 技术规范
 │   │   ├── 错误码规范.md
@@ -156,7 +167,32 @@ tools: Read, Grep, Glob
 - mybatis-plus/guide.md: 分页查询章节
 ```
 
-### 类型 5: 综合查询 (all)
+### 类型 5: 历史坑点查询 (pitfall)
+
+查询历史坑点档案，避免重复踩坑。
+
+**适用场景**:
+- 代码质量分析时识别已知陷阱
+- 开发前了解常见错误模式
+- 代码审查时检查潜在问题
+
+**目标目录**: `.qoder/repowiki/pitfalls/`
+
+**输入示例**:
+```
+关键词: "Feign 客户端重复创建"
+类型: pitfall
+目标路径: .qoder/repowiki/pitfalls/feign/
+```
+
+**输出示例**:
+```
+匹配结果:
+- feign-client-duplication.md: Feign 客户端重复创建坑点
+- facade-feign-prohibition.md: 门面服务禁止创建 feign 目录
+```
+
+### 类型 6: 综合查询 (all)
 
 跨所有类型进行查询，返回最相关的结果。
 
@@ -209,6 +245,42 @@ tools: Read, Grep, Glob
 2. 遍历目录下的所有文档
 3. 匹配文件名和内容
 4. 提取最相关的片段
+```
+
+#### 历史坑点查询流程
+
+```
+1. 确定查询范围: .qoder/repowiki/pitfalls/{category}/
+2. 遍历坑点档案文件
+3. 匹配坑点模式(pattern)和关键词
+4. 提取坑点描述、违规示例、解决方案
+5. 返回给代码质量分析 Skill 用于检查
+```
+
+**坑点档案格式**:
+```markdown
+# 坑点标题
+
+## 问题描述
+简要描述这个坑点是什么
+
+## 违规模式
+代码特征或模式，用于自动检测
+
+## 违规示例
+错误的代码示例
+
+## 正确方案
+正确的代码示例
+
+## 相关规范
+- 架构规范: xxx
+- 编码规范: xxx
+
+## 归档信息
+- 发现时间: 2026-02-27
+- 发现人: Qoder
+- 相关 Program: P-2026-001-REQ-018
 ```
 
 ### Step 3: 生成查询报告
