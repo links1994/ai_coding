@@ -1,4 +1,4 @@
-package com.aim.mall.agent.config;
+package com.aim.mall.config;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;

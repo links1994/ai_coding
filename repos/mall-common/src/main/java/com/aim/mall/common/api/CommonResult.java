@@ -1,6 +1,5 @@
 package com.aim.mall.common.api;
 
-import com.aim.mall.common.api.ResultCode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -110,56 +109,6 @@ public class CommonResult<T> {
      */
     public static <T> CommonResult<T> failed(IErrorCode errorCode, String message) {
         return new CommonResult<T>(errorCode.getCode(), message, null);
-    }
-
-    /**
-     * 失败返回结果
-     *
-     * @param message 提示信息
-     */
-    public static <T> CommonResult<T> failed(String message) {
-        return new CommonResult<T>(ResultCode.FAILED.getCode(), message, null);
-    }
-
-    /**
-     * 失败返回结果
-     */
-    public static <T> CommonResult<T> failed() {
-        return failed(ResultCode.FAILED);
-    }
-
-    /**
-     * 参数验证失败返回结果
-     */
-    public static <T> CommonResult<T> validateFailed() {
-        return failed(ResultCode.VALIDATE_FAILED);
-    }
-
-    /**
-     * 参数验证失败返回结果
-     *
-     * @param message 提示信息
-     */
-    public static <T> CommonResult<T> validateFailed(String message) {
-        return new CommonResult<T>(ResultCode.VALIDATE_FAILED.getCode(), message, null);
-    }
-
-    /**
-     * 未登录返回结果
-     */
-    public static <T> CommonResult<T> unauthorized(T data) {
-        return new CommonResult<T>(ResultCode.UNAUTHORIZED.getCode(), ResultCode.UNAUTHORIZED.getMessage(), data);
-    }
-
-    /**
-     * 未授权返回结果
-     */
-    public static <T> CommonResult<T> forbidden(T data) {
-        return new CommonResult<T>(ResultCode.FORBIDDEN.getCode(), ResultCode.FORBIDDEN.getMessage(), data);
-    }
-
-    public static <T> CommonResult<T> inputIllegal() {
-        return new CommonResult<>(ResultCode.INPUT_ILLEGAL.getCode(), ResultCode.INPUT_ILLEGAL.getMessage(), null);
     }
 
     public long getCode() {

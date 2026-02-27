@@ -1,4 +1,4 @@
-package com.aim.mall.agent.config;
+package com.aim.mall.config;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;

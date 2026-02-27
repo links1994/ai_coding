@@ -5,7 +5,7 @@ import com.aim.mall.agent.api.dto.request.JobTypeListApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeUpdateApiRequest;
 import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
 import com.aim.mall.agent.domain.entity.AimJobTypeDO;
-import com.mall.common.api.CommonResult;
+import com.aim.mall.common.api.CommonResult;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public interface JobTypeService {
     /**
      * 分页查询岗位类型列表（Service层完成DO到Response的转换）
      *
-     * @param query 查询参数
+     * @param request 查询参数
      * @return 分页结果（返回Response）
      */
     CommonResult<CommonResult.PageData<JobTypeApiResponse>> pageJobType(JobTypeListApiRequest request);

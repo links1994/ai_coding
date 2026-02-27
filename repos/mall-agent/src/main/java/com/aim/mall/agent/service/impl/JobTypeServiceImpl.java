@@ -9,7 +9,7 @@ import com.aim.mall.agent.domain.enums.ErrorCodeEnum;
 import com.aim.mall.agent.domain.exception.BusinessException;
 import com.aim.mall.agent.mapper.JobTypeMapper;
 import com.aim.mall.agent.service.JobTypeService;
-import com.mall.common.api.CommonResult;
+import com.aim.mall.common.api.CommonResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.aim.mall.agent.config;
+package com.aim.mall.config;
 
 import com.aim.mall.agent.domain.exception.BusinessException;
 import com.aim.mall.agent.domain.exception.MethodArgumentValidationException;

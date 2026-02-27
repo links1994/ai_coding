@@ -1,4 +1,4 @@
-package com.aim.mall.agent.config;
+package com.aim.mall.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

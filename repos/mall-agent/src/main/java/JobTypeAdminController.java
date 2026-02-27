@@ -6,7 +6,7 @@ import com.aim.mall.admin.domain.dto.request.JobTypeUpdateRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeListApiRequest;
 import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
 import com.aim.mall.agent.api.feign.AgentRemoteService;
-import com.mall.common.api.CommonResult;
+import com.aim.mall.common.api.CommonResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
