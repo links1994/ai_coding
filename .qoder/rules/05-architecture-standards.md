@@ -235,7 +235,7 @@ public class JobTypeQueryService {
 
     private final AimJobTypeService aimJobTypeService;
 
-    public Page<AimJobTypeDO> pageJobType(JobTypeListQuery query) {
+    public Page<AimJobTypeDO> pageJobType(JobTypePageQuery query) {
         LambdaQueryWrapper<AimJobTypeDO> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.isNotBlank(query.getKeyword())) {
@@ -269,7 +269,7 @@ public class OrderQueryService {
     /**
      * 索引覆盖分页 - 先查ID，再批量查数据
      */
-    public Page<AimOrderDO> pageByCoveringIndex(OrderListQuery query) {
+    public Page<AimOrderDO> pageByCoveringIndex(OrderPageQuery query) {
         // 只能调用 AimOrderService，不直接调用 AimOrderMapper
         return aimOrderService.pageByCoveringIndex(query.getPageNum(), query.getPageSize());
     }
@@ -526,11 +526,12 @@ repos/mall-inner-api/
 │   │   └── api/
 │   │       ├── dto/
 │   │       │   ├── request/             # 远程调用请求参数
-│   │       │   │   ├── JobTypeCreateRequest.java
-│   │       │   │   ├── JobTypeUpdateRequest.java
-│   │       │   │   └── JobTypeListQuery.java
+│   │       │   │   ├── JobTypeCreateApiRequest.java
+│   │       │   │   ├── JobTypeUpdateApiRequest.java
+│   │       │   │   ├── JobTypePageApiRequest.java
+│   │       │   │   └── JobTypeStatusApiRequest.java
 │   │       │   └── response/            # 远程调用返回值
-│   │       │       └── JobTypeResponse.java
+│   │       │       └── JobTypeApiResponse.java
 │   │       ├── enums/                   # 远程接口使用的枚举
 │   │       │   └── JobTypeStatusEnum.java
 │   │       └── feign/                   # Feign 客户端
@@ -655,7 +656,9 @@ mall-admin/
 
 **Service 层内部约束**：
 
-- 请求参数以 `Query` 结尾（如 `JobTypeListQuery`）
+- 分页查询参数以 `PageQuery` 结尾（如 `JobTypePageQuery`）
+- 列表查询参数以 `ListQuery` 结尾（如 `JobTypeListQuery`）
+- 普通查询参数以 `Query` 结尾（如 `AgentQuery`）
 - 返回以 `DTO` 结尾（如 `JobTypeDTO`）
 - **禁止**使用 `Request`、`Response` 作为内部 Service 参数/返回类型后缀
 

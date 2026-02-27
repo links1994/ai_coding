@@ -130,6 +130,8 @@ mall-admin/src/main/java/com/aim/mall/
 | **前端 Request**  | 门面服务   | `domain/dto/request/`  | 前端请求参数（本地）   | `XxxRequest`            |
 | **前端 Response** | 门面服务   | `domain/dto/response/` | 前端返回值（本地）    | `XxxResponse` / `XxxVO` |
 | **Query**       | 应用服务   | `domain/dto/`          | Service层查询参数 | `XxxQuery`              |
+| **PageQuery**   | 应用服务   | `domain/dto/`          | 分页查询参数     | `XxxPageQuery`          |
+| **ListQuery**   | 应用服务   | `domain/dto/`          | 列表查询参数     | `XxxListQuery`          |
 | **DTO**         | 应用服务   | `domain/dto/`          | 内部数据传输       | `XxxDTO`                |
 | **DO**          | 应用服务   | `domain/entity/`       | 数据库实体        | `AimXxxDO`              |
 
@@ -147,6 +149,18 @@ mall-admin/src/main/java/com/aim/mall/
 - Request/Response **仅用于Controller层**，不直接传递到Service层
 - Controller层负责转换：Request → Query/DTO → 调用Service
 - Service层入参只能是Query或DTO，不能是Request
+
+**查询参数 vs 更新请求命名区分**：
+
+| 场景 | 命名后缀 | 使用位置 | 示例 |
+|------|---------|---------|------|
+| **分页查询** | `PageQuery` | Service层内部 | `JobTypePageQuery` |
+| **列表查询** | `ListQuery` | Service层内部 | `JobTypeListQuery` |
+| **部分更新** | `Request` | Controller层 | `JobTypeStatusRequest` |
+
+**关键区别**：
+- `PageQuery/ListQuery`：用于查询场景，包含查询条件+分页信息，Service层内部使用
+- `Request`：用于更新场景（特别是部分字段更新），Controller层接收前端请求
 
 **门面服务调用远程服务的命名区分**：
 

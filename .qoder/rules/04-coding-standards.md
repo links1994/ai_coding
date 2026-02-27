@@ -174,6 +174,8 @@ private LocalDateTime createTime;
 | 前端 Request    | 大驼峰 + Request 后缀       | `AgentCreateRequest`     | 门面服务     | 前端请求参数（本地使用）              |
 | 前端 Response   | 大驼峰 + Response 后缀      | `AgentResponse`          | 门面服务     | 前端返回值（本地使用）               |
 | Query         | 大驼峰 + Query 后缀         | `AgentListQuery`         | 应用服务     | **Service层内部查询参数**（仅内部使用） |
+| PageQuery     | 大驼峰 + PageQuery 后缀     | `JobTypePageQuery`       | 应用服务     | **分页查询参数**（Service层内部使用） |
+| ListQuery     | 大驼峰 + ListQuery 后缀     | `JobTypeListQuery`       | 应用服务     | **列表查询参数**（Service层内部使用） |
 | DTO           | 大驼峰 + DTO 后缀           | `AgentDTO`               | 应用服务     | 内部数据传输对象                  |
 | DomainService | 大驼峰 + DomainService 后缀 | `AgentDomainService`     | 应用服务     | 业务域服务                     |
 | QueryService  | 大驼峰 + QueryService 后缀  | `AgentQueryService`      | 应用服务     | 查询服务                      |
@@ -191,6 +193,30 @@ private LocalDateTime createTime;
 - **Controller 层**：请求参数必须以 `Request` 结尾，返回参数必须以 `Response` 或 `VO` 结尾
 - **Service 层内部**：请求参数以 `Query` 结尾，返回以 `DTO` 结尾
 - **禁止混用**：Controller 层不得使用 `Query` 或 `DTO` 作为参数/返回类型后缀
+
+#### 查询参数 vs 更新参数命名区分
+
+**列表/分页查询参数**（Service层内部使用）：
+- 使用 `ListQuery` 或 `PageQuery` 后缀
+- 包含查询条件 + 分页信息
+- 示例：`JobTypeListQuery`, `AgentPageQuery`
+
+**部分更新请求参数**（Controller层使用）：
+- 使用 `Request` 后缀
+- 表示部分字段更新（非全量）
+- 示例：`JobTypeUpdateRequest`, `AgentStatusRequest`
+
+**区分示例**：
+```java
+// 分页查询（Service层内部）
+public Page<AimJobTypeDO> pageJobType(JobTypePageQuery query);
+
+// 列表查询（Service层内部）
+public List<AimJobTypeDO> listJobType(JobTypeListQuery query);
+
+// 部分更新（Controller层）
+public CommonResult<Void> updateStatus(@RequestBody JobTypeStatusRequest request);
+```
 
 #### 方法命名
 
