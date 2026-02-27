@@ -415,13 +415,42 @@ public class AgentController {
 
 ### 4.1 三种标准异常
 
-仅允许使用以下三种标准异常类型：
+仅允许使用以下三种标准异常类型，均支持自定义错误消息：
 
 | 异常类型                                | 使用场景     | 示例              |
 |-------------------------------------|----------|-----------------|
 | `MethodArgumentValidationException` | 参数校验失败   | 必填字段为空、格式错误     |
 | `RemoteApiCallException`            | 远程服务调用失败 | Feign 调用超时、返回错误 |
 | `BusinessException`                 | 业务规则违反   | 用户不存在、余额不足      |
+
+**三种异常均支持以下构造方式**：
+
+```java
+// 1. 仅错误码 - 使用错误码的默认消息
+throw new BusinessException(ErrorCodeEnum.AGENT_BUSINESS_ERROR);
+throw new MethodArgumentValidationException(ErrorCodeEnum.PARAM_ERROR);
+throw new RemoteApiCallException(ErrorCodeEnum.REMOTE_ERROR);
+
+// 2. 错误码 + 自定义消息 - 优先使用自定义消息
+throw new BusinessException(ErrorCodeEnum.AGENT_BUSINESS_ERROR, "岗位类型不存在");
+throw new MethodArgumentValidationException(ErrorCodeEnum.PARAM_ERROR, "编码不能为空");
+throw new RemoteApiCallException(ErrorCodeEnum.REMOTE_ERROR, "用户服务调用失败");
+
+// 3. 错误码 + 异常原因 - 保留异常堆栈
+throw new BusinessException(ErrorCodeEnum.AGENT_BUSINESS_ERROR, cause);
+throw new MethodArgumentValidationException(ErrorCodeEnum.PARAM_ERROR, cause);
+throw new RemoteApiCallException(ErrorCodeEnum.REMOTE_ERROR, cause);
+
+// 4. 错误码 + 自定义消息 + 异常原因
+throw new BusinessException(ErrorCodeEnum.AGENT_BUSINESS_ERROR, "操作失败", cause);
+throw new MethodArgumentValidationException(ErrorCodeEnum.PARAM_ERROR, "参数校验失败", cause);
+throw new RemoteApiCallException(ErrorCodeEnum.REMOTE_ERROR, "调用失败", cause);
+```
+
+**使用原则**：
+- 优先使用方式 1 或 2，明确错误类型
+- 方式 2 的自定义消息会覆盖错误码的默认消息
+- 方式 3、4 用于需要保留异常堆栈的场景
 
 ### 4.2 异常处理规范
 
@@ -481,8 +510,8 @@ CommonResult.success(data, "自定义消息");       // 返回成功数据和自
 CommonResult.pageSuccess(items, totalCount);   // 分页成功响应
 
 // 失败响应
-CommonResult.failed(errorCode);             // 使用错误码枚举
-CommonResult.failed(errorCode, "错误信息");   // 错误码 + 自定义消息
+CommonResult.failed(errorCode);              // 使用错误码枚举
+CommonResult.failed(errorCode, "错误信息");    // 错误码 + 自定义消息
 ```
 
 ### 5.2 响应规范示例
@@ -623,14 +652,14 @@ public Long createAgent(AgentCreateDTO dto) {
 public CommonResult<Void> handleBusinessException(BusinessException e) {
     // 业务异常使用 WARN（非系统错误）
     log.warn("业务异常: {}", e.getMessage());
-    return CommonResult.error(e.getErrorCode());
+    return CommonResult.failed(e.getErrorCode());
 }
 
 @ExceptionHandler(Exception.class)
 public CommonResult<Void> handleException(Exception e) {
     // 系统异常使用 ERROR
     log.error("系统异常: {}", e.getMessage(), e);
-    return CommonResult.error(ErrorCodeEnum.SYSTEM_ERROR);
+    return CommonResult.failed(ErrorCodeEnum.SYSTEM_ERROR);
 }
 ```
 

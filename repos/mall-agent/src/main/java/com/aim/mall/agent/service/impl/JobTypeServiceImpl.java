@@ -150,7 +150,7 @@ public class JobTypeServiceImpl implements JobTypeService {
         log.debug("更新岗位类型状态开始, id={}, status={}", id, status);
 
         // 校验岗位类型是否存在
-        JobTypeDO existing = jobTypeMapper.selectByIdExcludeDeleted(id);
+        AimJobTypeDO existing = jobTypeMapper.selectByIdExcludeDeleted(id);
         if (existing == null) {
             throw new BusinessException(ErrorCodeEnum.AGENT_BUSINESS_ERROR, "岗位类型不存在");
         }
@@ -168,7 +168,7 @@ public class JobTypeServiceImpl implements JobTypeService {
         log.debug("删除岗位类型开始, id={}", id);
 
         // 校验岗位类型是否存在
-        JobTypeDO existing = jobTypeMapper.selectByIdExcludeDeleted(id);
+        AimJobTypeDO existing = jobTypeMapper.selectByIdExcludeDeleted(id);
         if (existing == null) {
             throw new BusinessException(ErrorCodeEnum.AGENT_BUSINESS_ERROR, "岗位类型不存在");
         }
