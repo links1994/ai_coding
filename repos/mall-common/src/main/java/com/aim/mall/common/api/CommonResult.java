@@ -1,6 +1,5 @@
-package com.mall.common.api;
+package com.aim.mall.common.api;
 
-import com.aim.mall.common.api.IErrorCode;
 import com.aim.mall.common.api.ResultCode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

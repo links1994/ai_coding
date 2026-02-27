@@ -5,7 +5,7 @@ import com.aim.mall.agent.api.dto.request.JobTypeListApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeStatusApiRequest;
 import com.aim.mall.agent.api.dto.request.JobTypeUpdateApiRequest;
 import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
-import com.mall.common.api.CommonResult;
+import com.aim.mall.common.api.CommonResult;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +27,7 @@ public interface JobTypeFeignClient {
     /**
      * 分页查询岗位类型列表
      *
-     * @param query 查询参数
+     * @param request 查询参数
      * @return 分页结果
      */
     @PostMapping("/list")

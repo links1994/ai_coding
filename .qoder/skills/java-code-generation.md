@@ -86,9 +86,9 @@ mall-agent/src/main/java/com/aim/mall/agent/
 └── config/              # 配置类
 ```
 
-**API 模块（mall-agent-api）- 独立模块**：
+**API 模块（mall-agent-api）- 统一放在 mall-inner-api 目录**：
 ```
-mall-agent-api/src/main/java/com/aim/mall/agent/
+repos/mall-inner-api/mall-agent-api/src/main/java/com/aim/mall/agent/
 └── api/
     ├── dto/
     │   ├── request/     # 远程调用请求参数

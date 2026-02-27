@@ -7,7 +7,7 @@ import com.aim.mall.agent.api.dto.request.JobTypeUpdateApiRequest;
 import com.aim.mall.agent.api.dto.response.JobTypeApiResponse;
 import com.aim.mall.agent.domain.entity.AimJobTypeDO;
 import com.aim.mall.agent.service.JobTypeService;
-import com.mall.common.api.CommonResult;
+import com.aim.mall.common.api.CommonResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class JobTypeInnerController {
      * 规范：Controller 层只做参数转换和调用 Service，不做业务逻辑。
      * 数据转换（DO → Response）在 Service 层完成。
      *
-     * @param query 查询参数
+     * @param request 查询参数
      * @return 分页结果
      */
     @PostMapping("/list")
