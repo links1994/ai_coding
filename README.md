@@ -136,6 +136,7 @@ PRD → Phase 1: Requirements Decomposition
 | Phase 4 | Technical spec | Java code files | Generate code using Skill |
 | Phase 5 | Controller code | `.http` test files | Generate HTTP tests |
 | Phase 6 | Generated code | Quality report | Analyze and optimize code quality |
+| Phase 7 | Completed code | Feature archive | Archive feature for future reuse |
 
 ### 3.3 Three-Layer Service Architecture
 

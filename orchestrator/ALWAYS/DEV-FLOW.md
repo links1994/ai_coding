@@ -63,7 +63,25 @@ git branch -D feature/<name>  # 如果本地分支还在
 
 ### 7. 更新 Program 状态
 
-更新 STATUS.yml，如果 Program 完成则写 workspace/RESULT.md。
+更新 `STATUS.yml`，如果 Program 完成则写 `workspace/RESULT.md`。
+
+### 8. 功能归档（可选但推荐）
+
+功能开发完成并合并后，进行功能归档：
+
+```bash
+# 功能归档由 Agent 自动执行
+# 生成位置: .qoder/repowiki/feature/{feature-name}/
+```
+
+**归档内容**：
+- 功能档案 (`feature-archive.md`): 功能描述、接口清单、核心类、设计决策
+- 复用指南 (`reuse-guide.md`): 如何复用此功能
+- 代码片段 (`snippets/`): 可复用的代码片段
+
+**触发方式**：
+- 用户指令: "归档功能" 或 "委托: 归档功能"
+- 自动触发: Program 完成后自动归档（如配置了自动归档）
 
 ---
 
