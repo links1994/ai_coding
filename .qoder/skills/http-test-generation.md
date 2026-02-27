@@ -29,7 +29,7 @@ tools: Read, Write, Grep, Glob
 ## 输出
 
 - HTTP 测试文件：`{Controller目录}/http/{controller小写}-api.http`
-- 测试报告：`artifacts/generated/{program_id}/reports/http-test-report.md`
+- 测试报告：`orchestrator/PROGRAMS/{program_id}/workspace/http-test-report.md`
 
 ---
 
@@ -132,7 +132,7 @@ user: {"id": 1, "device_id": "device_001", "user_name": "test_user"}
 
 ```
 状态：已完成
-报告：artifacts/generated/{program_id}/reports/http-test-report.md
+报告：orchestrator/PROGRAMS/{program_id}/workspace/http-test-report.md
 产出：N 个 HTTP 测试文件（列出文件路径）
 决策点：无
 ```

@@ -28,8 +28,8 @@ tools: Read, Write, Grep, Glob
 
 ## 输出
 
-- 代码质量分析报告：`artifacts/generated/{program_id}/reports/code-quality-report.md`
-- 质量分析数据：`artifacts/generated/{program_id}/reports/code-quality-analysis.yaml`
+- 代码质量分析报告：`orchestrator/PROGRAMS/{program_id}/workspace/code-quality-report.md`
+- 质量分析数据：`orchestrator/PROGRAMS/{program_id}/workspace/code-quality-analysis.yaml`
 
 ---
 
@@ -171,7 +171,7 @@ code_quality_analysis:
 
 ```
 状态：已完成
-报告：artifacts/generated/{program_id}/reports/code-quality-analysis.yaml
+报告：orchestrator/PROGRAMS/{program_id}/workspace/code-quality-analysis.yaml
 产出：N 个优化建议（含代码修改）
 决策点：需要人工确认高风险重构吗？
 ```

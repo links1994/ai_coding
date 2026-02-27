@@ -26,7 +26,8 @@ tools: Read, Write, Grep, Glob
 
 ## 输入
 
-- `artifacts/spec/{program_id}/design.md` — 技术规格书
+- `orchestrator/PROGRAMS/{program_id}/workspace/tech-spec.md` — 技术规格书
+- `orchestrator/PROGRAMS/{program_id}/workspace/openapi.yaml` — API 定义
 - `orchestrator/ALWAYS/RESOURCE-MAP.yml` — 项目资源映射
 - `orchestrator/PROGRAMS/{program_id}/SCOPE.yml` — 写入范围控制
 - `.qoder/rules/04-coding-standards.md` — 编码规范
@@ -37,7 +38,7 @@ tools: Read, Write, Grep, Glob
 ## 输出
 
 - 各服务的 Java 源代码 → `{service}/src/main/java/`
-- 代码生成报告 `artifacts/generated/{program_id}/reports/code-generation-report.md`
+- 代码生成报告 `orchestrator/PROGRAMS/{program_id}/workspace/code-generation-report.md`
 
 ---
 
@@ -45,10 +46,11 @@ tools: Read, Write, Grep, Glob
 
 ### Step 1: 读取配置
 
-1. 读取技术规格书（design.md）
-2. 读取项目资源映射（RESOURCE-MAP.yml）
-3. 读取写入范围（SCOPE.yml）
-4. 读取编码规范和架构规范
+1. 读取技术规格书（tech-spec.md）
+2. 读取 API 定义（openapi.yaml）
+3. 读取项目资源映射（RESOURCE-MAP.yml）
+4. 读取写入范围（SCOPE.yml）
+5. 读取编码规范和架构规范
 
 ### Step 2: 服务分析
 
@@ -287,7 +289,7 @@ public class AimOrderService extends ServiceImpl<AimOrderMapper, AimOrderDO> {
 
 ### Step 5: 输出报告
 
-生成 `artifacts/generated/{program_id}/reports/code-generation-report.md`：
+生成 `orchestrator/PROGRAMS/{program_id}/workspace/code-generation-report.md`：
 
 ```markdown
 # 代码生成报告
@@ -323,7 +325,7 @@ public class AimOrderService extends ServiceImpl<AimOrderMapper, AimOrderDO> {
 
 ## 代码模板
 
-代码模板统一维护在：`artifacts/generated/_TEMPLATE/java-code.md`
+代码模板统一维护在：`.qoder/skills/java-code-generation.md`（本文件包含代码模板）
 
 模板包含：
 - **Controller 模板**：门面服务（管理端/客户端）+ 应用服务（内部接口）
@@ -388,7 +390,7 @@ public class AimOrderService extends ServiceImpl<AimOrderMapper, AimOrderDO> {
 
 ```
 状态：已完成
-报告：artifacts/generated/{program_id}/reports/code-generation-report.md
+报告：orchestrator/PROGRAMS/{program_id}/workspace/code-generation-report.md
 产出：N 个文件（列出各服务代码路径）
 决策点：无
 ```
